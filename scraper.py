@@ -5,13 +5,19 @@ from scrapers import BaseScraper, KijijiScraper, PadmapperScraper
 
 from fake_useragent import UserAgent
 from selenium import webdriver
-from selenium.webdriver.edge.service import Service as EdgeService
-from selenium.webdriver.edge.options import Options as EdgeOptions
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 import pandas as pd
+
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Create a session object
 session = requests.Session()
@@ -19,18 +25,18 @@ session = requests.Session()
 # Generate a random user agent
 user_agent = UserAgent().random
 
-# Path to Edge WebDriver executable
-edge_driver_path = r"C:\Users\ShivamJ\Downloads\edgedriver_win32\msedgedriver.exe"
+# Access the WebDriver path from the environment variable
+chrome_driver_path = os.getenv('CHROMEDRIVER_PATH')
 
-# Set up Edge options (optional, for additional configurations)
-edge_options = EdgeOptions()
-edge_options.add_argument(f'user-agent={user_agent}')
+# Set up Chrome options (optional, for additional configurations)
+chrome_options = ChromeOptions()
+chrome_options.add_argument(f'user-agent={user_agent}')
 
-# Set up Edge service
-edge_service = EdgeService(executable_path=edge_driver_path)
+# Set up Chrome service
+chrome_service = ChromeService(executable_path=chrome_driver_path)
 
-# Initialize Edge WebDriver with the service
-driver = webdriver.Edge(service=edge_service, options=edge_options)
+# Initialize Chrome WebDriver with the service
+driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 
 # kijiji_base_url = 'https://www.kijiji.ca'
 # kijiji_full_url = f'{kijiji_base_url}/b-for-rent/city-of-toronto/c30349001l1700273'

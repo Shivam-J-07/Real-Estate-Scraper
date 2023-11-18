@@ -6,22 +6,20 @@ from enum import Enum
 
 def get_headers(base_url):
     user_agent = UserAgent().random
-    
-    # Get a random user agent for Windows
-    while not 'windows' in user_agent.lower():
+
+    # Get a random user agent for Mac OS Chrome
+    while not ('mac' in user_agent.lower() and 'chrome' in user_agent.lower()):
         user_agent = UserAgent().random
-    
-    print(user_agent)
-    # Set additional headers to mimic realistic behavior
+
+    # Set additional headers to mimic realistic behavior for Chrome on Mac
     headers = {
         'User-Agent': user_agent,
-        'DNT': '1',  # Do Not Track,
+        'DNT': '1',  # Do Not Track
         'Accept-Language': 'en-US,en;q=0.5',
         'Referer': f'{base_url}',
-        'DNT': '1',
-        'Sec-Ch-Ua': '"Microsoft Edge";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+        'Sec-Ch-Ua': '" Not A;Brand";v="99", "Chromium";v="100", "Google Chrome";v="100"',
         'Sec-Ch-Ua-Mobile': '?0',
-        'Sec-Ch-Ua-Platform': 'Windows',
+        'Sec-Ch-Ua-Platform': '"macOS"',
         'Sec-Fetch-Dest': 'document',
         'Sec-Fetch-Mode': 'navigate',
         'Sec-Fetch-Site': 'same-origin',
@@ -32,7 +30,7 @@ def get_headers(base_url):
 
 def generate_time_gap():
     # Add a delay between requests to avoid overloading the server
-    time.sleep(random.uniform(3, 7))
+    time.sleep(random.uniform(2, 5))
 
 def get_absolute_url(base_url, href):
     return href if href.startswith('http') else f'{base_url}{href}'

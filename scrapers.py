@@ -23,8 +23,8 @@ class BaseScraper():
         self.full_url = full_url
         self.links = [
             "https://www.padmapper.com/buildings/p368402/apartments-at-39-niagara-st-toronto-on-m5v-0t6#back=%2Fapartments%2Ftoronto-on",
-            "https://www.padmapper.com/buildings/p751811/the-residences-at-the-well-apartments-at-425-wellington-st-w-toronto-on-m5v-0v3",
-            "https://www.padmapper.com/buildings/p751811/the-residences-at-the-well-apartments-at-425-wellington-st-w-toronto-on-m5v-0v3#back=%2Fapartments%2Ftoronto-on%3Fbox%3D-79.44856%2C43.64122%2C-79.37927%2C43.68725"
+            # "https://www.padmapper.com/buildings/p751811/the-residences-at-the-well-apartments-at-425-wellington-st-w-toronto-on-m5v-0v3",
+            # "https://www.padmapper.com/buildings/p751811/the-residences-at-the-well-apartments-at-425-wellington-st-w-toronto-on-m5v-0v3#back=%2Fapartments%2Ftoronto-on%3Fbox%3D-79.44856%2C43.64122%2C-79.37927%2C43.68725"
             ]
         self.listings = []
     
