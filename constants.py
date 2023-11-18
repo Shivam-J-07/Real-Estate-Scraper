@@ -1,5 +1,17 @@
 from enum import Enum
 
+class TableHeaders(Enum):
+    BUILDING = 'Building'
+    ADDRESS = 'Address'
+    LISTING = 'Listing'
+    BED = 'Bed'
+    BATH = 'Bath'
+    SQFT = 'SqFt'
+    PRICE = 'Price'
+    UNIT_AMENITIES = 'Unit Amenities'
+    BUILDING_AMENITIES =  'Building Amenities'
+    PETS = 'Pets'
+
 locations = [
     {
         'location': 'Downtown Core',
@@ -59,15 +71,15 @@ locations = [
     }
 ]
 
-
-class Headers(Enum):
-    BUILDING = 'Building'
-    ADDRESS = 'Address'
-    LISTING = 'Listing'
-    BED = 'Bed'
-    BATH = 'Bath'
-    SQFT = 'SqFt'
-    PRICE = 'Price'
-    UNIT_AMENITIES = 'Unit Amenities'
-    BUILDING_AMENITIES =  'Building Amenities'
-    PETS = 'Pets'
+table_columns = [
+    TableHeaders.BUILDING.value,
+    TableHeaders.ADDRESS.value,
+    TableHeaders.LISTING.value,
+    TableHeaders.BED.value,
+    TableHeaders.BATH.value,
+    TableHeaders.SQFT.value,
+    TableHeaders.PRICE.value,
+    TableHeaders.UNIT_AMENITIES.value,
+    TableHeaders.BUILDING_AMENITIES.value,
+    TableHeaders.PETS.value
+]

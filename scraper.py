@@ -1,15 +1,11 @@
 import requests
-from bs4 import BeautifulSoup
-from utils import generate_time_gap, TableHeaders
-from scrapers import BaseScraper, KijijiScraper, PadmapperScraper
+from constants import table_columns
+from scrapers import PadmapperScraper
 
 from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 import pandas as pd
 
@@ -58,19 +54,6 @@ urls = [
 
 listings = []
 
-table_columns = [
-    TableHeaders.BUILDING.value,
-    TableHeaders.ADDRESS.value,
-    TableHeaders.LISTING.value,
-    TableHeaders.BED.value,
-    TableHeaders.BATH.value,
-    TableHeaders.SQFT.value,
-    TableHeaders.PRICE.value,
-    TableHeaders.UNIT_AMENITIES.value,
-    TableHeaders.BUILDING_AMENITIES.value,
-    TableHeaders.PETS.value
-]
-
 df = pd.DataFrame(columns=table_columns)
 
 padmapper_scraper.scrape_all_links(driver)
@@ -86,18 +69,3 @@ df.to_excel('rental_listings.xlsx', index=False)
 
 # Close the driver
 driver.quit()
-
-# all_links = []
-
-# # Number of pages to scrape
-# num_pages = 2
-
-# # Loop through the pages and scrape them
-# for page_num in range(1, num_pages + 1):
-#     page_url = f'{kijiji_base_url}?page={page_num}'
-#     links = kijiji_scraper.scrape_page(session)
-#     all_links.extend(links)
-#     generate_time_gap()
-
-# for link in all_links:
-#     print(f'{kijiji_base_url}{link}')

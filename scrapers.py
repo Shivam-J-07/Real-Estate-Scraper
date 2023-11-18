@@ -6,11 +6,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from bs4 import BeautifulSoup
+from constants import TableHeaders
 from utils import (
     get_headers,
     get_absolute_url, 
     generate_time_gap, 
-    TableHeaders,
     match_address, 
     match_pets
 )
