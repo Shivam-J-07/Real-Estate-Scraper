@@ -2,8 +2,6 @@ from fake_useragent import UserAgent
 import random
 import time
 
-from enum import Enum
-
 def get_headers(base_url):
     user_agent = UserAgent().random
 
@@ -35,9 +33,6 @@ def generate_time_gap():
 def get_absolute_url(base_url, href):
     return href if href.startswith('http') else f'{base_url}{href}'
 
-def get_address_element(tag):
-    return 'h' in tag.name and 'address' in tag.text.lower().strip()
-
 def make_matcher(tag_name, text):
     def match_tag(element):
         return (
@@ -49,17 +44,3 @@ def make_matcher(tag_name, text):
 match_address = make_matcher('h', 'address')
 match_pets = make_matcher('h', 'Dogs')
 match_sqft = make_matcher('h', 'feet')
-
-class TableHeaders(Enum):
-    BUILDING = 'Building'
-    ADDRESS = 'Address'
-    LISTING = 'Listing'
-    BED = 'Bed'
-    BATH = 'Bath'
-    SQFT = 'SqFt'
-    PRICE = 'Price'
-    UNIT_AMENITIES = 'Unit Amenities'
-    BUILDING_AMENITIES =  'Building Amenities'
-    PETS = 'Pets'
-    
-
