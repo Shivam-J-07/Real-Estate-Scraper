@@ -127,7 +127,7 @@ class PadmapperScraper(BaseScraper):
         return [get_absolute_url(self.base_url, link.get('href')) for link in link_elements]
 
             
-    def get_rental_listing(self, web_driver, url: str) -> list:
+    def get_rental_listing_data(self, web_driver, url: str) -> list:
         """
         Iterates over all collected urls and scrapes data from each link's page.
 
@@ -162,15 +162,15 @@ class PadmapperScraper(BaseScraper):
                 is_single_unit = True
             
             link_html_content = web_driver.page_source
-            self.get_rental_unit_data(link_html_content, is_single_unit)
+            return self.get_rental_units_data_by_listing(link_html_content, is_single_unit)
         
         except Exception as e:
             print(f"Error encountered on page {url}: {e}")
             raise
     
-    def get_rental_unit_data(self, link_html_content, is_single_unit):
+    def get_rental_units_data_by_listing(self, link_html_content, is_single_unit):
         """
-        Extracts relevant data from rental unit listing page
+        Extracts relevant data for each rental unit on listing (can be single unit)
 
         Args:
             link_html_content (str): The HTML content of the page to be scraped.
@@ -194,6 +194,7 @@ class PadmapperScraper(BaseScraper):
                 TableHeaders.SQFT.value: sqft_text,
             }
         ]
+        rental_listing_units = []
 		# Concatenate each row of rental unit data with columns for building and rental unit amenities
         for unit_data in all_units_data:
             unit_data[TableHeaders.PETS.value] = pets_text
@@ -203,7 +204,10 @@ class PadmapperScraper(BaseScraper):
             unit_data[TableHeaders.BUILDING.value] = building_title_text
             unit_data[TableHeaders.LAT.value] = lat_text
             unit_data[TableHeaders.LON.value] = lon_text
-            self.listings.append(unit_data)
+            rental_listing_units.append(unit_data)
+
+        self.listings += rental_listing_units
+        return rental_listing_units
         
 class DataExtractor():
     @staticmethod

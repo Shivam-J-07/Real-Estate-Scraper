@@ -52,14 +52,14 @@ padmapper_listings = []
 # Scrape page content of collected URLs to get rental listing data 
 for url in padmapper_scraper.urls:
     try:
-        if len(padmapper_listings) == 100:
+        if len(padmapper_listings) >= 100:
             # on every 100 listings read, write them to the excel sheet (in case of crash)
             all_listings += padmapper_listings
             current_df = pd.DataFrame(padmapper_listings, columns=table_columns)
             all_listings_df = pd.concat([all_listings_df, current_df], ignore_index=True)
             all_listings_df.to_excel('rental_listings.xlsx', index=False)
             padmapper_listings.clear()
-        padmapper_listings.append(padmapper_scraper.get_rental_listing(driver, url))
+        padmapper_listings += padmapper_scraper.get_rental_listing_data(driver, url) # add most recent listing
     except:
         continue
 
