@@ -33,10 +33,7 @@ class BaseScraper():
     def __init__(self, base_url="", full_url=""):
         self.base_url = base_url
         self.full_url = full_url
-        self.urls = [
-            'https://www.padmapper.com/apartments/21008452p/2-bedroom-1-bath-apartment-at-124-portland-st-toronto-on-m5v-2n5',
-            'https://www.padmapper.com/buildings/p955742/maple-house-at-canary-landing-apartments-at-131-mill-st-toronto-on-m5a-none'
-        ]
+        self.urls = []
         self.listings = []
     
     def make_request(self, session: type) -> str:
@@ -84,6 +81,8 @@ class PadmapperScraper(BaseScraper):
             self.scroll_to_end_of_page(web_driver)
             self.urls = self.extract_urls(web_driver)
             print(f"Number of URLs: {len(self.urls)}")
+            for url in self.urls:
+                print(url)
         except Exception as e:
             print(f"ERROR: {str(e)}")
 
@@ -121,47 +120,46 @@ class PadmapperScraper(BaseScraper):
         return [get_absolute_url(self.base_url, link.get('href')) for link in link_elements]
 
             
-    def get_all_rental_listings_data(self, web_driver):
+    def get_rental_listing(self, web_driver, url: str) -> list:
         """
         Iterates over all collected urls and scrapes data from each link's page.
 
         Args:
             web_driver (webdriver): The Selenium WebDriver to use for scraping.
         """
-        
-        for link in self.urls:
-            is_single_unit = False
-            try:
-                # Improved page load with retries
-                for attempt in range(3):  # Retry up to 3 times
-                    try:
-                        web_driver.get(link)
-                        generate_time_gap(1,2)
-                        WebDriverWait(web_driver, 10).until(
-                            lambda d: d.execute_script('return document.readyState') == 'complete'
-                        )
-                        break  # Exit the retry loop if page load is successful
-                    except TimeoutException:
-                        if attempt == 2:  # Raise an exception on the last attempt
-                            raise
+        is_single_unit = False
+        try:
+            # Improved page load with retries
+            for attempt in range(3):  # Retry up to 3 times
                 try:
-                    # Optional wait: proceed if elements are found, skip if not
-                    dropdown_divs = WebDriverWait(web_driver, 2).until(
-                        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[class*='Floorplan_floorplanPanel']"))
+                    web_driver.get(url)
+                    generate_time_gap(1,2)
+                    WebDriverWait(web_driver, 10).until(
+                        lambda d: d.execute_script('return document.readyState') == 'complete'
                     )
-                    # dropdown_divs = web_driver.find_elements(By.CSS_SELECTOR, "div[class*='Floorplan_floorplanPanel']")
-                    for div in dropdown_divs:
-                        web_driver.execute_script("arguments[0].scrollIntoView();", div)
-                        web_driver.execute_script("arguments[0].click();", div)
-                        generate_time_gap(1,1)
+                    break  # Exit the retry loop if page load is successful
                 except TimeoutException:
-                    is_single_unit = True
-                
-                link_html_content = web_driver.page_source
-                self.get_rental_unit_data(link_html_content, is_single_unit)
+                    if attempt == 2:  # Raise an exception on the last attempt
+                        raise
+            try:
+                # Optional wait: proceed if elements are found, skip if not
+                dropdown_divs = WebDriverWait(web_driver, 2).until(
+                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[class*='Floorplan_floorplanPanel']"))
+                )
+                # dropdown_divs = web_driver.find_elements(By.CSS_SELECTOR, "div[class*='Floorplan_floorplanPanel']")
+                for div in dropdown_divs:
+                    web_driver.execute_script("arguments[0].scrollIntoView();", div)
+                    web_driver.execute_script("arguments[0].click();", div)
+                    generate_time_gap(1,1)
+            except TimeoutException:
+                is_single_unit = True
             
-            except Exception as e:
-                print(f"Error encountered on page {link}: {e}")
+            link_html_content = web_driver.page_source
+            self.get_rental_unit_data(link_html_content, is_single_unit)
+        
+        except Exception as e:
+            print(f"Error encountered on page {url}: {e}")
+            raise
     
     def get_rental_unit_data(self, link_html_content, is_single_unit):
         """
@@ -179,7 +177,7 @@ class PadmapperScraper(BaseScraper):
         unit_amenities_text, building_amenities_text = DataExtractor.extract_amenities(soup)
 
         all_units_data = DataExtractor.extract_rental_unit_details(soup)
-
+		# For single page listings, all_units_data is already extracted from extract_building_details() and extract_rental_unit_details() will return empty
         all_units_data = all_units_data if all_units_data else [
             {
                 TableHeaders.LISTING.value: bed_text,

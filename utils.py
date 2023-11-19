@@ -2,7 +2,6 @@
 from fake_useragent import UserAgent
 import random
 import time
-from geopy.geocoders import Nominatim
 
 def get_headers(base_url):
     # Create a UserAgent object to generate random user agent strings
