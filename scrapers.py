@@ -120,7 +120,8 @@ class PadmapperScraper(BaseScraper):
         link_elements = soup.find_all('a', class_=lambda cls: cls and cls.startswith('ListItemFull_headerText'))
         return [get_absolute_url(self.base_url, link.get('href')) for link in link_elements]
 
-    def get_page_content_from_urls(self, web_driver):
+            
+    def get_all_rental_listings_data(self, web_driver):
         """
         Iterates over all collected urls and scrapes data from each link's page.
 
@@ -188,7 +189,7 @@ class PadmapperScraper(BaseScraper):
                 TableHeaders.SQFT.value: sqft_text,
             }
         ]
-
+		# Concatenate each row of rental unit data with columns for building and rental unit amenities
         for unit_data in all_units_data:
             unit_data[TableHeaders.PETS.value] = pets_text
             unit_data[TableHeaders.UNIT_AMENITIES.value] = unit_amenities_text
