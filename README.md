@@ -29,7 +29,8 @@ xattr -cr 'Google Chrome for Testing.app'
 In the project directory, start by creating and activating a virtual environment:
 
 ```bash
-python -m venv env # naming it env
+python -m venv env # create virtual env named env
+source env/bin/activate # activate it
 ```
 
 Then install all the project requirements:
@@ -46,4 +47,4 @@ CHROMEDRIVER_PATH=YOUR_INSTALLATION_PATH
 
 ### Running the project
 
-You can start the project by running `scraper.py`.
+You can start the project by running `main.py`.
