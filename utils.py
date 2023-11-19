@@ -2,6 +2,7 @@
 from fake_useragent import UserAgent
 import random
 import time
+from geopy.geocoders import Nominatim
 
 def get_headers(base_url):
     # Create a UserAgent object to generate random user agent strings
@@ -28,9 +29,9 @@ def get_headers(base_url):
     }
     return headers
 
-def generate_time_gap():
+def generate_time_gap(min=2, max=4):
     # Generates a random time delay to simulate human browsing and avoid server overload or detection
-    time.sleep(random.uniform(2, 5))
+    time.sleep(random.uniform(min, max))
 
 def get_absolute_url(base_url, href):
     # Constructs an absolute URL from a base URL and a relative URL (href)
@@ -48,5 +49,8 @@ def make_matcher(tag_name, text):
 
 # Using make_matcher to create specific tag matchers
 match_address = make_matcher('h', 'address')  # Matcher for header tags containing address information
-match_pets = make_matcher('h', 'Dogs')  # Matcher for header tags containing pet information
+match_pets = make_matcher('h', 'dogs')  # Matcher for header tags containing pet information
 match_sqft = make_matcher('h', 'feet')  # Matcher for header tags containing sqft information
+match_price = make_matcher('h', 'price') # Matcher for header tags containing price information
+match_bed = make_matcher('h', 'bed') # Matcher for header tags containing price information
+match_bath = make_matcher('h', 'bath') # Matcher for header tags containing price information

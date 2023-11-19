@@ -10,7 +10,11 @@ from utils import (
     get_absolute_url, 
     generate_time_gap, 
     match_address, 
-    match_pets
+    match_pets,
+    match_bed,
+    match_bath,
+    match_price,
+    match_sqft
 )
 
 import re
@@ -29,7 +33,10 @@ class BaseScraper():
     def __init__(self, base_url="", full_url=""):
         self.base_url = base_url
         self.full_url = full_url
-        self.urls = []
+        self.urls = [
+            'https://www.padmapper.com/apartments/21008452p/2-bedroom-1-bath-apartment-at-124-portland-st-toronto-on-m5v-2n5',
+            'https://www.padmapper.com/buildings/p955742/maple-house-at-canary-landing-apartments-at-131-mill-st-toronto-on-m5a-none'
+        ]
         self.listings = []
     
     def make_request(self, session: type) -> str:
@@ -113,7 +120,6 @@ class PadmapperScraper(BaseScraper):
         link_elements = soup.find_all('a', class_=lambda cls: cls and cls.startswith('ListItemFull_headerText'))
         return [get_absolute_url(self.base_url, link.get('href')) for link in link_elements]
 
-            
     def get_page_content_from_urls(self, web_driver):
         """
         Iterates over all collected urls and scrapes data from each link's page.
@@ -121,33 +127,42 @@ class PadmapperScraper(BaseScraper):
         Args:
             web_driver (webdriver): The Selenium WebDriver to use for scraping.
         """
+        
         for link in self.urls:
+            is_single_unit = False
             try:
-                web_driver.get(link)
-                generate_time_gap()
-                WebDriverWait(web_driver, 30).until(
-                    lambda d: d.execute_script('return document.readyState') == 'complete'
-                )
+                # Improved page load with retries
+                for attempt in range(3):  # Retry up to 3 times
+                    try:
+                        web_driver.get(link)
+                        generate_time_gap(1,2)
+                        WebDriverWait(web_driver, 10).until(
+                            lambda d: d.execute_script('return document.readyState') == 'complete'
+                        )
+                        break  # Exit the retry loop if page load is successful
+                    except TimeoutException:
+                        if attempt == 2:  # Raise an exception on the last attempt
+                            raise
                 try:
                     # Optional wait: proceed if elements are found, skip if not
-                    WebDriverWait(web_driver, 10).until(
+                    dropdown_divs = WebDriverWait(web_driver, 2).until(
                         EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[class*='Floorplan_floorplanPanel']"))
                     )
-                    dropdown_divs = web_driver.find_elements(By.CSS_SELECTOR, "div[class*='Floorplan_floorplanPanel']")
+                    # dropdown_divs = web_driver.find_elements(By.CSS_SELECTOR, "div[class*='Floorplan_floorplanPanel']")
                     for div in dropdown_divs:
                         web_driver.execute_script("arguments[0].scrollIntoView();", div)
                         web_driver.execute_script("arguments[0].click();", div)
-                        generate_time_gap()
+                        generate_time_gap(1,1)
                 except TimeoutException:
-                    print(f"Specific elements not found on {link}. Proceeding with available content.")
+                    is_single_unit = True
                 
                 link_html_content = web_driver.page_source
-                self.get_rental_unit_data(link_html_content)
+                self.get_rental_unit_data(link_html_content, is_single_unit)
             
             except Exception as e:
                 print(f"Error encountered on page {link}: {e}")
     
-    def get_rental_unit_data(self, link_html_content):
+    def get_rental_unit_data(self, link_html_content, is_single_unit):
         """
         Extracts relevant data from rental unit listing page
 
@@ -158,19 +173,30 @@ class PadmapperScraper(BaseScraper):
         # Parse the HTML with Beautiful Soup
         soup = BeautifulSoup(link_html_content, 'html.parser')
         
-        building_title_text, address_text, pets_text = DataExtractor.extract_building_details(soup)
+        building_title_text, price_text, bed_text, bath_text, sqft_text, address_text, pets_text, lat_text, lon_text = DataExtractor.extract_building_details(soup)
 
         unit_amenities_text, building_amenities_text = DataExtractor.extract_amenities(soup)
 
         all_units_data = DataExtractor.extract_rental_unit_details(soup)
 
+        all_units_data = all_units_data if all_units_data else [
+            {
+                TableHeaders.LISTING.value: bed_text,
+                TableHeaders.BED.value: bed_text,
+                TableHeaders.PRICE.value: price_text,
+                TableHeaders.BATH.value: bath_text,
+                TableHeaders.SQFT.value: sqft_text,
+            }
+        ]
+
         for unit_data in all_units_data:
-            unit_data[TableHeaders.PETS.value] = pets_text
             unit_data[TableHeaders.PETS.value] = pets_text
             unit_data[TableHeaders.UNIT_AMENITIES.value] = unit_amenities_text
             unit_data[TableHeaders.BUILDING_AMENITIES.value] = building_amenities_text
             unit_data[TableHeaders.ADDRESS.value] = address_text
             unit_data[TableHeaders.BUILDING.value] = building_title_text
+            unit_data[TableHeaders.LAT.value] = lat_text
+            unit_data[TableHeaders.LON.value] = lon_text
             self.listings.append(unit_data)
         
 class DataExtractor():
@@ -190,17 +216,28 @@ class DataExtractor():
 
         details = soup.find('div', class_=lambda cls: cls and 'SummaryTable_summaryTable_' in cls)
 
-        address_header = details.find(match_address)
-        parent_address_li = address_header.find_parent('li')
-        address_div = parent_address_li.find('div') if parent_address_li else None
-        address_text = address_div.get_text().strip() if address_div else ""
-        
-        pets_header = details.find(match_pets)
-        parent_pets_li = pets_header.find_parent('li')
-        pets_div = parent_pets_li.find('div') if parent_pets_li else None
-        pets_text = pets_div.get_text().strip() if pets_div else ""
+        [price_text, bed_text, bath_text, sqft_text, address_text, pets_text] = DataExtractor.extract_summary_table(details)
 
-        return (building_title_text, address_text, pets_text)
+        # Find the latitude meta tag
+        latitude_tag = soup.find('meta', {'name': 'place:location:latitude'})
+        lat_text = latitude_tag['content'] if latitude_tag else ""
+
+        # Find the longitude meta tag
+        longitude_tag = soup.find('meta', {'name': 'place:location:longitude'})
+        lon_text = longitude_tag['content'] if longitude_tag else ""
+
+        return (building_title_text, price_text, bed_text, bath_text, sqft_text, address_text, pets_text, lat_text, lon_text)
+
+    @staticmethod
+    def extract_summary_table(soup: BeautifulSoup) -> list:
+        extracted_text = []
+        for matching_function in [match_price, match_bed, match_bath, match_sqft, match_address, match_pets]:
+            detail_header = soup.find(matching_function)
+            parent_detail_li = detail_header.find_parent('li') if detail_header else None
+            detail_div = parent_detail_li.find('div') if parent_detail_li else None
+            detail_text = detail_div.get_text().strip() if detail_div else ""
+            extracted_text.append(detail_text)
+        return extracted_text
 
     @staticmethod
     def extract_amenities(soup: BeautifulSoup) -> tuple:
@@ -242,10 +279,8 @@ class DataExtractor():
             List[dict]: A list of dictionaries, each containing data for a rental unit.
         """
         all_units_data = []
-
         # Find all divs where class contains 'Floorplan_floorplan'
         floorplans = soup.find_all('div', class_=lambda cls: cls and 'Floorplan_floorplansContainer_' in cls)
-        
         for floorplan in floorplans:
             current_floorplan = floorplan.find('div', class_=lambda cls: cls and 'Floorplan_title_' in cls)
             floorplan_title_text = current_floorplan.get_text().strip() if current_floorplan else ""
@@ -277,3 +312,4 @@ class DataExtractor():
                 all_units_data.append(unit_data)
         
         return all_units_data
+

@@ -11,6 +11,8 @@ class TableHeaders(Enum):
     UNIT_AMENITIES = 'Unit Amenities'
     BUILDING_AMENITIES =  'Building Amenities'
     PETS = 'Pets'
+    LAT = 'Latitude'
+    LON = 'Longitude'
 
 locations = [
     {
@@ -81,5 +83,7 @@ table_columns = [
     TableHeaders.PRICE.value,
     TableHeaders.UNIT_AMENITIES.value,
     TableHeaders.BUILDING_AMENITIES.value,
-    TableHeaders.PETS.value
+    TableHeaders.PETS.value,
+    TableHeaders.LAT.value,
+    TableHeaders.LON.value
 ]
