@@ -73,11 +73,18 @@ class PadmapperScraper(BaseScraper):
             web_driver (webdriver): The Selenium WebDriver to use for scraping.
         """
         try:
-            web_driver.get(self.full_url)
-            generate_time_gap()
-            WebDriverWait(web_driver, 20).until(
-                lambda d: d.execute_script('return document.readyState') == 'complete'
-            )
+            # Improved page load with retries
+            for attempt in range(3):  # Retry up to 3 times
+                try:
+                    web_driver.get(url)
+                    generate_time_gap(1,2)
+                    WebDriverWait(web_driver, 10).until(
+                        lambda d: d.execute_script('return document.readyState') == 'complete'
+                    )
+                    break  # Exit the retry loop if page load is successful
+                except TimeoutException:
+                    if attempt == 2:  # Raise an exception on the last attempt
+                        raise
             self.scroll_to_end_of_page(web_driver)
             self.urls = self.extract_urls(web_driver)
             print(f"Number of URLs: {len(self.urls)}")
