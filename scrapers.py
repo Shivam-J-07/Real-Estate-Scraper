@@ -76,11 +76,11 @@ class PadmapperScraper(BaseScraper):
             # Improved page load with retries
             for attempt in range(3):  # Retry up to 3 times
                 try:
-                    web_driver.get(url)
-                    generate_time_gap(1,2)
+                    web_driver.get(self.full_url)
+                    generate_time_gap(1, 2)
                     WebDriverWait(web_driver, 10).until(
-                        lambda d: d.execute_script('return document.readyState') == 'complete'
-                    )
+						lambda d: d.execute_script('return document.readyState') == 'complete'
+					)
                     break  # Exit the retry loop if page load is successful
                 except TimeoutException:
                     if attempt == 2:  # Raise an exception on the last attempt
@@ -102,7 +102,7 @@ class PadmapperScraper(BaseScraper):
         """
         while True:
             web_driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(3)  # Adjust based on the site's response time
+            time.sleep(1)  # Adjust based on the site's response time
             try:
                 no_more_content_divs = web_driver.find_elements(By.XPATH, "//*[contains(@class, 'list_noMoreResult')]")
                 if no_more_content_divs:

@@ -27,6 +27,7 @@ chrome_driver_path = os.getenv('CHROMEDRIVER_PATH')
 # Set up Chrome options (optional, for additional configurations)
 chrome_options = ChromeOptions()
 chrome_options.add_argument(f'user-agent={user_agent}')
+chrome_options.add_argument('--headless')  # Enable headless mode (does not open browser GUI)
 
 # Set up Chrome service
 chrome_service = ChromeService(executable_path=chrome_driver_path)
@@ -40,12 +41,13 @@ lat_lon_bounding_box = []
 # Padmapper --------------------------------------------------
 
 padmapper_base_url = 'https://www.padmapper.com'
-padmapper_full_url = f'{padmapper_base_url}/apartments/vancouver-bc/'
+padmapper_full_url = f'{padmapper_base_url}/apartments/calgary-ab/'
 padmapper_scraper = PadmapperScraper(padmapper_base_url, padmapper_full_url)
 
 # Collect rental listing URLs from main page to scrape
 padmapper_scraper.fetch_rental_listing_urls(session, driver)
 
+all_listings_df = pd.DataFrame(columns=table_columns)
 padmapper_listings = []
 # Scrape page content of collected URLs to get rental listing data 
 for url in padmapper_scraper.urls:
@@ -57,7 +59,7 @@ for url in padmapper_scraper.urls:
             all_listings_df = pd.concat([all_listings_df, current_df], ignore_index=True)
             all_listings_df.to_excel('rental_listings.xlsx', index=False)
             padmapper_listings.clear()
-        padmapper_listings.append(padmapper_scraper.get_rental_listing(url))
+        padmapper_listings.append(padmapper_scraper.get_rental_listing(driver, url))
     except:
         continue
 
