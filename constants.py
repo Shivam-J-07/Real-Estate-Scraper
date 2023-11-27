@@ -14,6 +14,42 @@ class TableHeaders(Enum):
     LAT = 'Latitude'
     LON = 'Longitude'
 
+class UnitAmenities(Enum):
+    BALCONY = 'Balcony'
+    IN_UNIT_LAUNDRY = 'In Unit Laundry'
+    AIR_CONDITIONING = 'Air Conditioning' 
+    HIGH_CEILINGS = 'High Ceilings'
+    FURNISHED = 'Furnished'
+    HARDWOOD_FLOOR = 'Hardwood Floor'
+
+class BuildingAmenities(Enum):
+    CONTROLLED_ACCESS = 'Controlled Access'
+    FITNESS_CENTER = 'Fitness Center'
+    SWIMMING_POOL = 'Swimming Pool'
+    ROOF_DECK = 'Roof Deck'
+    STORAGE = 'Storage'
+    RESIDENTS_LOUNGE = 'Residents Lounge'
+    OUTDOOR_SPACE = 'Outdoor Space'
+
+UnitAmenitiesDict = {
+    UnitAmenities.BALCONY: 0,
+    UnitAmenities.IN_UNIT_LAUNDRY: 0,
+    UnitAmenities.AIR_CONDITIONING: 0,
+    UnitAmenities.HIGH_CEILINGS: 0,
+    UnitAmenities.FURNISHED: 0,
+    UnitAmenities.HARDWOOD_FLOOR: 0
+}
+
+BuildingAmenitiesDict = {
+    BuildingAmenities.CONTROLLED_ACCESS: 0,
+    BuildingAmenities.FITNESS_CENTER: 0,
+    BuildingAmenities.SWIMMING_POOL: 0,
+    BuildingAmenities.ROOF_DECK: 0,
+    BuildingAmenities.STORAGE: 0,
+    BuildingAmenities.RESIDENTS_LOUNGE: 0,
+    BuildingAmenities.OUTDOOR_SPACE: 0
+}
+
 locations = [
     {
         'location': 'Downtown Core',
