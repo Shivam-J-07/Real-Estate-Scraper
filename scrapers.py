@@ -87,7 +87,6 @@ class PadmapperScraper(BaseScraper):
                         raise
             self.scroll_to_end_of_page(web_driver)
             self.urls = self.extract_urls(web_driver)
-            print(f"Number of URLs: {len(self.urls)}")
             for url in self.urls:
                 print(url)
         except Exception as e:
