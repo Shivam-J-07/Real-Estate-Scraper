@@ -32,22 +32,22 @@ class BuildingAmenities(Enum):
     OUTDOOR_SPACE = 'Outdoor Space'
 
 UnitAmenitiesDict = {
-    UnitAmenities.BALCONY: 0,
-    UnitAmenities.IN_UNIT_LAUNDRY: 0,
-    UnitAmenities.AIR_CONDITIONING: 0,
-    UnitAmenities.HIGH_CEILINGS: 0,
-    UnitAmenities.FURNISHED: 0,
-    UnitAmenities.HARDWOOD_FLOOR: 0
+    UnitAmenities.BALCONY.value: 0,
+    UnitAmenities.IN_UNIT_LAUNDRY.value: 0,
+    UnitAmenities.AIR_CONDITIONING.value: 0,
+    UnitAmenities.HIGH_CEILINGS.value: 0,
+    UnitAmenities.FURNISHED.value: 0,
+    UnitAmenities.HARDWOOD_FLOOR.value: 0
 }
 
 BuildingAmenitiesDict = {
-    BuildingAmenities.CONTROLLED_ACCESS: 0,
-    BuildingAmenities.FITNESS_CENTER: 0,
-    BuildingAmenities.SWIMMING_POOL: 0,
-    BuildingAmenities.ROOF_DECK: 0,
-    BuildingAmenities.STORAGE: 0,
-    BuildingAmenities.RESIDENTS_LOUNGE: 0,
-    BuildingAmenities.OUTDOOR_SPACE: 0
+    BuildingAmenities.CONTROLLED_ACCESS.value: 0,
+    BuildingAmenities.FITNESS_CENTER.value: 0,
+    BuildingAmenities.SWIMMING_POOL.value: 0,
+    BuildingAmenities.ROOF_DECK.value: 0,
+    BuildingAmenities.STORAGE.value: 0,
+    BuildingAmenities.RESIDENTS_LOUNGE.value: 0,
+    BuildingAmenities.OUTDOOR_SPACE.value: 0
 }
 
 locations = [

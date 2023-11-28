@@ -23,6 +23,9 @@ for index, row in df.iterrows():
     price_value = row[TableHeaders.PRICE.value]
     unit_amenities_value = row[TableHeaders.UNIT_AMENITIES.value]
     building_amenities_value = row[TableHeaders.BUILDING_AMENITIES.value]
+    pets_value = row[TableHeaders.PETS.value]
+    longitude_value = row[TableHeaders.LON.value]
+    latitude_value = row[TableHeaders.LAT.value]
 
     if 'bedroom' in bed_value or ('studio' in bed_value and 'room' not in bed_value):
         try:
@@ -77,21 +80,30 @@ for index, row in df.iterrows():
                 if amenity in building_amenities_dict.keys():
                     building_amenities_dict[amenity] = 1
         
+        if not pd.isna(pets_value):
+            if 'dog' or 'cat' or 'yes' in pets_value.lower():
+                pets_value = 1
+            else:
+                pets_value = 0
+        else:
+            continue
+        
         cleaned_list.append(
             {
                 TableHeaders.BUILDING.value: building_value,
                 TableHeaders.ADDRESS.value: address_value,
                 TableHeaders.LISTING.value: listing_value,
-                TableHeaders.BED.value: 1,
-                TableHeaders.BATH.value: 1,
-                TableHeaders.SQFT.value: 1,
-                TableHeaders.PRICE.value: 1,
-                TableHeaders.UNIT_AMENITIES.value: 1,
-                TableHeaders.BUILDING_AMENITIES.value: 1,
-                TableHeaders.PETS.value: 1,
-                TableHeaders.LAT.value: 1,
-                TableHeaders.LON.value: 1
+                TableHeaders.BED.value: bed_value,
+                TableHeaders.BATH.value: bath_value,
+                TableHeaders.SQFT.value: sqft_value,
+                TableHeaders.PRICE.value: price_value,
+                TableHeaders.UNIT_AMENITIES.value: unit_amenities_dict,
+                TableHeaders.BUILDING_AMENITIES.value: building_amenities_dict,
+                TableHeaders.PETS.value: pets_value,
+                TableHeaders.LAT.value: latitude_value,
+                TableHeaders.LON.value: longitude_value
             }
         )
 
-print(cleaned_list)
+for unit in cleaned_list:
+    print(unit)
