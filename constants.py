@@ -3,6 +3,7 @@ from enum import Enum
 class TableHeaders(Enum):
     BUILDING = 'Building'
     ADDRESS = 'Address'
+    CITY = 'City'
     LISTING = 'Listing'
     BED = 'Bed'
     BATH = 'Bath'
@@ -30,6 +31,7 @@ class BuildingAmenities(Enum):
     STORAGE = 'Storage'
     RESIDENTS_LOUNGE = 'Residents Lounge'
     OUTDOOR_SPACE = 'Outdoor Space'
+
 
 UnitAmenitiesDict = {
     UnitAmenities.BALCONY.value: 0,
