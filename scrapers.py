@@ -2,6 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 from bs4 import BeautifulSoup
 from constants import TableHeaders
@@ -19,7 +20,6 @@ from utils import (
 
 import re
 import time
-
 class BaseScraper():
     """
     Abstract base class for building web scrapers.
@@ -30,30 +30,11 @@ class BaseScraper():
         urls (List[str]): List of URLs to scrape from.
         listings (List[dict]): All rental listings scraped.
     """
-    def __init__(self, base_url="", full_url=""):
+    def __init__(self, base_url="", complete_urls=[]):
         self.base_url = base_url
-        self.full_url = full_url
+        self.complete_urls = complete_urls
         self.urls = []
         self.listings = []
-    
-    def make_request(self, session: type) -> str:
-        """
-        Makes an HTTP GET request using the provided session object.
-        
-        Args:
-            session (requests.Session): The session object to make the request.
-
-        Returns:
-            str: The response text of the HTTP request.
-
-        Raises:
-            Exception: If the response status code is not 200.
-        """
-        response = session.get(self.full_url, headers=get_headers(self.base_url))
-        if response.status_code != 200:
-            raise Exception(f"Failed to fetch page at {self.full_url}. Status code: {response.status_code}")
-        return response.text
-
       
 class PadmapperScraper(BaseScraper):
     """
@@ -61,58 +42,91 @@ class PadmapperScraper(BaseScraper):
 
     Inherits from BaseScraper and adds methods tailored for scraping Padmapper.
     """
-    def __init__(self, base_url="", full_url=""):
-        super().__init__(base_url, full_url)
+
+    def __init__(self, base_url="", complete_urls=[]):
+        super().__init__(base_url, complete_urls)
+        self.MAX_RETRIES = 3
+        self.PAGE_LOAD_TIMEOUT = 10
+        self.SCROLL_WAIT_TIME = 1
+        self.UNIT_COUNT_THRESHOLD = 2
     
-    def fetch_rental_listing_urls(self, session, web_driver):
+    def fetch_rental_listing_urls(self, web_driver: WebDriver):
         """
-        Retrieves and stores all the listing urls from the main page.
+        Retrieves and stores all the listing urls from the landing page.
 
         Args:
-            session (requests.Session): The session object to make the request.
             web_driver (webdriver): The Selenium WebDriver to use for scraping.
         """
-        try:
-            # Improved page load with retries
-            for attempt in range(3):  # Retry up to 3 times
-                try:
-                    web_driver.get(self.full_url)
-                    generate_time_gap(1, 2)
-                    WebDriverWait(web_driver, 10).until(
-						lambda d: d.execute_script('return document.readyState') == 'complete'
-					)
-                    break  # Exit the retry loop if page load is successful
-                except TimeoutException:
-                    if attempt == 2:  # Raise an exception on the last attempt
-                        raise
-            self.scroll_to_end_of_page(web_driver)
-            self.urls = self.extract_urls(web_driver)
+        for full_url in self.complete_urls:
+            print(f'Scrapers.py - Accessing {full_url}')
+            if self._try_load_page(web_driver, full_url):
+                self._click_tile_view_button(web_driver)
+                self.scroll_to_end_of_page(web_driver)
+                self.urls.extend(self.extract_urls(web_driver))
             for url in self.urls:
                 print(url)
-        except Exception as e:
-            print(f"ERROR: {str(e)}")
 
-    def scroll_to_end_of_page(self, web_driver):
+    def _try_load_page(self, web_driver: WebDriver, url):
+        """
+        Attempts to completely load page and avoid perpetually loading state
+
+        Args:
+            web_driver (webdriver): The Selenium WebDriver to use for scraping.
+        """
+        for attempt in range(self.MAX_RETRIES):
+            try:
+                web_driver.get(url)
+                time.sleep(self.SCROLL_WAIT_TIME)
+                WebDriverWait(web_driver, self.PAGE_LOAD_TIMEOUT).until(
+                    lambda d: d.execute_script('return document.readyState') == 'complete'
+                )
+                return True
+            except TimeoutException:
+                if attempt == self.MAX_RETRIES - 1:
+                    print(f"Scrapers.py - Timeout Error: {url}")
+                    return False
+    
+    def _click_tile_view_button(self, web_driver: WebDriver):
+        try:
+            # Locate the button by class and aria-label attributes
+            button = web_driver.find_element(by=By.CSS_SELECTOR, value="button[aria-label*='Tile'][class*='list_gridOptionIconContainer']")
+            button.click()
+            time.sleep(self.SCROLL_WAIT_TIME)
+        except NoSuchElementException:
+            print("Tile View button not found. Unable to continue")
+            raise
+
+    def scroll_to_end_of_page(self, web_driver: WebDriver):
         """
         Scrolls to the end of the page until no more content loads.
 
         Args:
             web_driver (webdriver): The Selenium WebDriver to use for scraping.
         """
+        last_height = web_driver.execute_script("return document.body.scrollHeight")
+
         while True:
+            # Scroll down to bottom
             web_driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(1)  # Adjust based on the site's response time
+            time.sleep(self.SCROLL_WAIT_TIME)  # Wait to load page
+
+            # Calculate new scroll height and compare with last scroll height
+            new_height = web_driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                print("No change in scroll height - reached the end of the page.")
+                break
+            last_height = new_height
             try:
                 no_more_content_divs = web_driver.find_elements(By.XPATH, "//*[contains(@class, 'list_noMoreResult')]")
                 if no_more_content_divs:
-                    print("Reached the end of the page.")
+                    print("Detected no more results div - reached the end of the page.")
                     break
             except NoSuchElementException:
                 continue
 
-    def extract_urls(self, web_driver):
+    def extract_urls(self, web_driver: WebDriver):
         """
-        Extracts rental listing URLs from the BeautifulSoup-parsed page.
+        Extracts rental listing URLs from home page
 
         Args:
             web_driver (webdriver): The Selenium WebDriver to use for scraping.
@@ -122,43 +136,56 @@ class PadmapperScraper(BaseScraper):
         """
         page_html_content = web_driver.page_source
         soup = BeautifulSoup(page_html_content, 'html.parser')
-        link_elements = soup.find_all('a', class_=lambda cls: cls and cls.startswith('ListItemFull_headerText'))
-        return [get_absolute_url(self.base_url, link.get('href')) for link in link_elements]
 
-            
-    def get_rental_listing_data(self, web_driver, url: str) -> list:
+        extracted_urls = []
+        link_elements = soup.find_all('a', class_=lambda cls: cls and cls.startswith('ListItemTile_address'))
+        for link in link_elements:
+            # Find the specific sibling div based on the class substring
+            for sibling in link.find_previous_siblings('div'):
+                if any("ListItemTile_bedBath" in cls for cls in sibling.get('class', [])) and 'floorplan' in sibling.get_text().lower():
+                    if int(sibling.get_text().split()[0]) >= self.UNIT_COUNT_THRESHOLD:
+                        # Extract the URL if number of floorplans is above threshold
+                        print(f"Extracted {sibling.get_text()} for {get_absolute_url(self.base_url, link.get('href'))}")
+                        extracted_urls.append(get_absolute_url(self.base_url, link.get('href')))
+                        break  # Move to the next link element after finding the correct div
+        return extracted_urls
+
+    def _process_floorplan_panels(self, web_driver: WebDriver) -> bool:
+        """
+        Processes floorplan panels on the page if present.
+
+        Args:
+            web_driver (WebDriver): The Selenium WebDriver to use for scraping.
+
+        Returns:
+            bool: True if it's a single unit listing, False if multiple units are present.
+        """
+        try:
+            dropdown_divs = WebDriverWait(web_driver, 2).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[class*='Floorplan_floorplanPanel']"))
+            )
+            for div in dropdown_divs:
+                web_driver.execute_script("arguments[0].scrollIntoView();", div)
+                web_driver.execute_script("arguments[0].click();", div)
+                time.sleep(self.SCROLL_WAIT_TIME)
+            return False
+        except TimeoutException:
+            return True  # If floorplan panels are not found, assume it's a single unit
+
+
+    def get_rental_listing_data(self, web_driver: WebDriver, url: str) -> list:
         """
         Iterates over all collected urls and scrapes data from each link's page.
 
         Args:
             web_driver (webdriver): The Selenium WebDriver to use for scraping.
+            url (str): URL of the listing page to scrape.
         """
-        is_single_unit = False
         try:
-            # Improved page load with retries
-            for attempt in range(3):  # Retry up to 3 times
-                try:
-                    web_driver.get(url)
-                    generate_time_gap(1,2)
-                    WebDriverWait(web_driver, 10).until(
-                        lambda d: d.execute_script('return document.readyState') == 'complete'
-                    )
-                    break  # Exit the retry loop if page load is successful
-                except TimeoutException:
-                    if attempt == 2:  # Raise an exception on the last attempt
-                        raise
-            try:
-                # Optional wait: proceed if elements are found, skip if not
-                dropdown_divs = WebDriverWait(web_driver, 2).until(
-                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[class*='Floorplan_floorplanPanel']"))
-                )
-                # dropdown_divs = web_driver.find_elements(By.CSS_SELECTOR, "div[class*='Floorplan_floorplanPanel']")
-                for div in dropdown_divs:
-                    web_driver.execute_script("arguments[0].scrollIntoView();", div)
-                    web_driver.execute_script("arguments[0].click();", div)
-                    generate_time_gap(1,1)
-            except TimeoutException:
-                is_single_unit = True
+            if not self._try_load_page(web_driver, url):
+                return []  # Skip processing this URL and continue with others
+            
+            is_single_unit = self._process_floorplan_panels(web_driver)
             
             link_html_content = web_driver.page_source
             return self.get_rental_units_data_by_listing(link_html_content, is_single_unit)
@@ -184,7 +211,7 @@ class PadmapperScraper(BaseScraper):
 
         all_units_data = DataExtractor.extract_rental_unit_details(soup)
 		# For single page listings, all_units_data is already extracted from extract_building_details() and extract_rental_unit_details() will return empty
-        all_units_data = all_units_data if all_units_data else [
+        all_units_data = all_units_data if not is_single_unit else [
             {
                 TableHeaders.LISTING.value: bed_text,
                 TableHeaders.BED.value: bed_text,
@@ -321,4 +348,3 @@ class DataExtractor():
                 all_units_data.append(unit_data)
         
         return all_units_data
-
