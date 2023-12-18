@@ -20,8 +20,6 @@ def create_chrome_driver(*, debugging_port):
     # Set up Chrome options (optional, for additional configurations)
     chrome_options = ChromeOptions()
     chrome_options.add_argument(f"user-agent={user_agent}")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument(f"--remote-debugging-port={debugging_port}")
     chrome_options.add_argument('--window-size=1920x1080')
     chrome_options.add_argument("--headless")  # Enable headless mode (does not open browser GUI)

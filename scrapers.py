@@ -3,6 +3,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.chrome.webdriver import WebDriver
+import pickle
 
 from bs4 import BeautifulSoup
 from constants import TableHeaders
@@ -90,7 +91,7 @@ class PadmapperScraper(BaseScraper):
         try:
             # Locate the button by class and aria-label attributes
             button = web_driver.find_element(by=By.CSS_SELECTOR, value="button[aria-label*='Tile'][class*='list_gridOptionIconContainer']")
-            button.click()
+            web_driver.execute_script("arguments[0].click();", button)
             time.sleep(self.SCROLL_WAIT_TIME)
         except NoSuchElementException:
             print("Tile View button not found. Unable to continue")
@@ -108,7 +109,7 @@ class PadmapperScraper(BaseScraper):
         while True:
             # Scroll down to bottom
             web_driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(self.SCROLL_WAIT_TIME)  # Wait to load page
+            generate_time_gap(2, 3)  # Wait to load page
 
             # Calculate new scroll height and compare with last scroll height
             new_height = web_driver.execute_script("return document.body.scrollHeight")
@@ -161,13 +162,13 @@ class PadmapperScraper(BaseScraper):
             bool: True if it's a single unit listing, False if multiple units are present.
         """
         try:
-            dropdown_divs = WebDriverWait(web_driver, 2).until(
+            dropdown_divs = WebDriverWait(web_driver, 10).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div[class*='Floorplan_floorplanPanel']"))
             )
             for div in dropdown_divs:
                 web_driver.execute_script("arguments[0].scrollIntoView();", div)
                 web_driver.execute_script("arguments[0].click();", div)
-                time.sleep(self.SCROLL_WAIT_TIME)
+                generate_time_gap(2, 3)
             return False
         except TimeoutException:
             return True  # If floorplan panels are not found, assume it's a single unit
@@ -186,8 +187,8 @@ class PadmapperScraper(BaseScraper):
                 return []  # Skip processing this URL and continue with others
             
             is_single_unit = self._process_floorplan_panels(web_driver)
-            
             link_html_content = web_driver.page_source
+            print(f"Processing listing: {url}")
             return self.get_rental_units_data_by_listing(link_html_content, is_single_unit)
         
         except Exception as e:
@@ -205,7 +206,7 @@ class PadmapperScraper(BaseScraper):
         # Parse the HTML with Beautiful Soup
         soup = BeautifulSoup(link_html_content, 'html.parser')
         
-        building_title_text, price_text, bed_text, bath_text, sqft_text, address_text, pets_text, lat_text, lon_text = DataExtractor.extract_building_details(soup)
+        building_title_text, price_text, bed_text, bath_text, sqft_text, address_text, pets_text, lat_text, lon_text, city_text = DataExtractor.extract_building_details(soup)
 
         unit_amenities_text, building_amenities_text = DataExtractor.extract_amenities(soup)
 
@@ -228,11 +229,16 @@ class PadmapperScraper(BaseScraper):
             unit_data[TableHeaders.BUILDING_AMENITIES.value] = building_amenities_text
             unit_data[TableHeaders.ADDRESS.value] = address_text
             unit_data[TableHeaders.BUILDING.value] = building_title_text
+            unit_data[TableHeaders.CITY.value] = city_text
             unit_data[TableHeaders.LAT.value] = lat_text
             unit_data[TableHeaders.LON.value] = lon_text
             rental_listing_units.append(unit_data)
 
         self.listings += rental_listing_units
+        print(f"Extracted {len(rental_listing_units)} units")
+        print(f"Total units: {len(self.listings)}")
+        with open('listings.pkl', 'wb') as file:
+            pickle.dump(self.listings, file)
         return rental_listing_units
         
 class DataExtractor():
@@ -262,7 +268,11 @@ class DataExtractor():
         longitude_tag = soup.find('meta', {'name': 'place:location:longitude'})
         lon_text = longitude_tag['content'] if longitude_tag else ""
 
-        return (building_title_text, price_text, bed_text, bath_text, sqft_text, address_text, pets_text, lat_text, lon_text)
+        # Find the city meta tag
+        city_tag = soup.find('meta', {'name': 'place:locality'})
+        city_text = city_tag['content'] if city_tag else ""
+
+        return (building_title_text, price_text, bed_text, bath_text, sqft_text, address_text, pets_text, lat_text, lon_text, city_text)
 
     @staticmethod
     def extract_summary_table(soup: BeautifulSoup) -> list:

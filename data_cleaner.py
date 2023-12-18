@@ -5,12 +5,6 @@ from constants import TableHeaders, UnitAmenitiesDict, BuildingAmenitiesDict
 MINIMUM_SQFT_THRESHOLD = 200
 
 ################## Parsing and validation functions #################
-def parse_city_value(address_value):
-    if pd.isna(address_value):
-        return None
-    cities = ["toronto", "edmonton"]
-    return next((city for city in cities if city in address_value.lower()), None)
-
 def parse_bed_value(bed_value):
     if pd.isna(bed_value):
         return None
@@ -79,15 +73,14 @@ def get_cleaned_data():
         unit_amenities = parse_amenities(row[TableHeaders.UNIT_AMENITIES.value], UnitAmenitiesDict)
         building_amenities = parse_amenities(row[TableHeaders.BUILDING_AMENITIES.value], BuildingAmenitiesDict)
         pets_value = parse_pets_value(row[TableHeaders.PETS.value])
-        city_value = parse_city_value(row[TableHeaders.ADDRESS.value])
 
-        if None in [bed_value, bath_value, sqft_value, price_value, city_value]:
+        if None in [bed_value, bath_value, sqft_value, price_value]:
             continue
 
         cleaned_list.append({
             TableHeaders.BUILDING.value: row[TableHeaders.BUILDING.value],
             TableHeaders.ADDRESS.value: row[TableHeaders.ADDRESS.value],
-            TableHeaders.CITY.value: city_value,
+            TableHeaders.CITY.value: row[TableHeaders.CITY.value],
             TableHeaders.LISTING.value: row[TableHeaders.LISTING.value],
             TableHeaders.BED.value: bed_value,
             TableHeaders.BATH.value: bath_value,

@@ -21,9 +21,6 @@ import os
 # Initialize WebDriver for retrieving rental listings from landing page
 fetch_rental_listings_driver: WebDriver = create_chrome_driver(debugging_port=9222)
 
-# Initialize WebDriver for extracting data from every rental listing
-get_rental_data_driver: WebDriver = create_chrome_driver(debugging_port=9223)
-
 current_dir = os.path.dirname(os.path.realpath(__file__))
 listings_path = os.path.join(current_dir, "rental_listings.xlsx")
 
@@ -33,10 +30,10 @@ all_listings = []
 
 padmapper_base_url = 'https://www.padmapper.com'
 padmapper_complete_urls = [
-    f'{padmapper_base_url}/apartments/toronto-on',
-    f'{padmapper_base_url}/apartments/vancouver-bc',
-    f'{padmapper_base_url}/apartments/winnipeg-mb',
-    f'{padmapper_base_url}/apartments/edmonton-ab',
+    # f'{padmapper_base_url}/apartments/toronto-on',
+    # f'{padmapper_base_url}/apartments/vancouver-bc',
+    # f'{padmapper_base_url}/apartments/winnipeg-mb',
+    # f'{padmapper_base_url}/apartments/edmonton-ab',
     f'{padmapper_base_url}/apartments/montreal-qc',
 ]
 padmapper_scraper = PadmapperScraper(padmapper_base_url, padmapper_complete_urls)
@@ -45,18 +42,22 @@ padmapper_scraper = PadmapperScraper(padmapper_base_url, padmapper_complete_urls
 
 padmapper_scraper.fetch_rental_listing_urls(fetch_rental_listings_driver)
 
+# Close the fetch_rental_listing_driver
+fetch_rental_listings_driver.quit()
+
+# Initialize WebDriver for extracting data from every rental listing
+get_rental_data_driver: WebDriver = create_chrome_driver(debugging_port=9223)
+
 with open('listings.txt', 'w') as file:
     file.write('\n'.join(padmapper_scraper.urls))
 
 all_listings_df = pd.DataFrame(columns=table_columns)
 padmapper_listings = []
 
-urls_page = 1
 # Scrape page content of collected URLs to get rental listing data 
 for url in padmapper_scraper.urls:
     try:
         if len(padmapper_listings) >= 100:
-            urls_page += 1
             all_listings += padmapper_listings
             current_df = pd.DataFrame(padmapper_listings, columns=table_columns)
             all_listings_df = pd.concat([all_listings_df, current_df], ignore_index=True)
@@ -78,9 +79,6 @@ current_df = pd.DataFrame(padmapper_listings, columns=table_columns)
 all_listings_df = pd.concat([all_listings_df, current_df], ignore_index=True)
 
 all_listings_df.to_excel(listings_path, index=False)
-
-# Close the fetch_rental_listing_driver
-fetch_rental_listings_driver.quit()
 
 # Close the get_rental_data_driver
 get_rental_data_driver.quit()
