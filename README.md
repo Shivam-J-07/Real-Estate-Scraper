@@ -2,6 +2,16 @@
 
 This project runs on [Python 3](https://www.python.org/downloads/). Make sure you have a version of Python 3 installed.
 
+## Overview
+
+![](./images/feature_importances.png)
+
+![](./images/price_to_sqft.png)
+
+![](./images/linear_regression.png)
+
+![](./images/random_forest.png)
+
 ## Setup
 
 ### Installing `chromedriver`

@@ -60,10 +60,13 @@ class PadmapperScraper(BaseScraper):
         """
         for full_url in self.complete_urls:
             print(f'Scrapers.py - Accessing {full_url}')
-            if self._try_load_page(web_driver, full_url):
-                self._click_tile_view_button(web_driver)
-                self.scroll_to_end_of_page(web_driver)
-                self.urls.extend(self.extract_urls(web_driver))
+            try:
+                if self._try_load_page(web_driver, full_url):
+                    self._click_tile_view_button(web_driver)
+                    self.scroll_to_end_of_page(web_driver)
+                    self.urls.extend(self.extract_urls(web_driver))
+            except NoSuchElementException:
+                continue
             for url in self.urls:
                 print(url)
 
@@ -88,6 +91,12 @@ class PadmapperScraper(BaseScraper):
                     return False
     
     def _click_tile_view_button(self, web_driver: WebDriver):
+        """
+        Renders tile view so sufficient details are accessible in each listing
+
+        Args:
+            web_driver (webdriver): The Selenium WebDriver to use for scraping.
+        """
         try:
             # Locate the button by class and aria-label attributes
             button = web_driver.find_element(by=By.CSS_SELECTOR, value="button[aria-label*='Tile'][class*='list_gridOptionIconContainer']")
@@ -117,13 +126,13 @@ class PadmapperScraper(BaseScraper):
                 print("No change in scroll height - reached the end of the page.")
                 break
             last_height = new_height
-            try:
-                no_more_content_divs = web_driver.find_elements(By.XPATH, "//*[contains(@class, 'list_noMoreResult')]")
-                if no_more_content_divs:
-                    print("Detected no more results div - reached the end of the page.")
-                    break
-            except NoSuchElementException:
-                continue
+            # try:
+            #     no_more_content_divs = web_driver.find_elements(By.XPATH, "//*[contains(@class, 'list_noMoreResult')]")
+            #     if no_more_content_divs:
+            #         print("Detected no more results div - reached the end of the page.")
+            #         break
+            # except NoSuchElementException:
+            #     continue
 
     def extract_urls(self, web_driver: WebDriver):
         """
@@ -139,12 +148,14 @@ class PadmapperScraper(BaseScraper):
         soup = BeautifulSoup(page_html_content, 'html.parser')
 
         extracted_urls = []
+        # Get all rental listing URLS visible on the page
         link_elements = soup.find_all('a', class_=lambda cls: cls and cls.startswith('ListItemTile_address'))
         for link in link_elements:
-            # Find the specific sibling div based on the class substring
+            # Find the number of floorplans for the listing by getting the relevant sibling div
             for sibling in link.find_previous_siblings('div'):
                 if any("ListItemTile_bedBath" in cls for cls in sibling.get('class', [])) and 'floorplan' in sibling.get_text().lower():
-                    if int(sibling.get_text().split()[0]) >= self.UNIT_COUNT_THRESHOLD:
+                    unit_count = int(sibling.get_text().split()[0])
+                    if unit_count >= self.UNIT_COUNT_THRESHOLD:
                         # Extract the URL if number of floorplans is above threshold
                         print(f"Extracted {sibling.get_text()} for {get_absolute_url(self.base_url, link.get('href'))}")
                         extracted_urls.append(get_absolute_url(self.base_url, link.get('href')))

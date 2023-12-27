@@ -3,8 +3,8 @@ import pandas as pd
 from constants import TableHeaders
 
 class UnitType:
-    def __init__(self, bed: int, num_units: int, sqft: pd.Series, prices: pd.Series):
-        self.bed = bed
+    def __init__(self, unit_type: int, num_units: int, sqft: pd.Series, prices: pd.Series):
+        self.unit_type = unit_type
         self.num_units = num_units
         self.sqft: np.array = np.array(sqft)
         self.price: np.array = np.array(prices)
@@ -33,11 +33,11 @@ class Building:
 
         return building_info
 
-    def add_unit_type(self, bed, unit_df: pd.DataFrame):
-        sqft_values: pd.Series = unit_df[TableHeaders.SQFT.value]
-        prices_values: pd.Series = unit_df[TableHeaders.PRICE.value]
-        num_units: int = len(unit_df)
-        self.unit_types[bed] = UnitType(bed, num_units, sqft_values, prices_values)
+    def add_unit_type(self, unit_type, unit_type_df: pd.DataFrame):
+        sqft_values: pd.Series = unit_type_df[TableHeaders.SQFT.value]
+        prices_values: pd.Series = unit_type_df[TableHeaders.PRICE.value]
+        num_units: int = len(unit_type_df)
+        self.unit_types[unit_type] = UnitType(unit_type, num_units, sqft_values, prices_values)
 
     @property
     def all_sqft_values(self):

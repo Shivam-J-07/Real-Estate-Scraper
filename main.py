@@ -7,9 +7,6 @@ from configs import (
 )
 from scrapers import PadmapperScraper
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.webdriver import WebDriver
 
 import pandas as pd
@@ -23,8 +20,6 @@ fetch_rental_listings_driver: WebDriver = create_chrome_driver(debugging_port=92
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
 listings_path = os.path.join(current_dir, "rental_listings.xlsx")
-
-all_listings = []
 
 # Padmapper --------------------------------------------------
 
@@ -48,35 +43,37 @@ fetch_rental_listings_driver.quit()
 # Initialize WebDriver for extracting data from every rental listing
 get_rental_data_driver: WebDriver = create_chrome_driver(debugging_port=9223)
 
+# Log all extracted listings to a txt file for data permanence
 with open('listings.txt', 'w') as file:
     file.write('\n'.join(padmapper_scraper.urls))
 
-all_listings_df = pd.DataFrame(columns=table_columns)
-padmapper_listings = []
+all_units_df = pd.DataFrame(columns=table_columns)
+current_units = []
+all_units = []
 
 # Scrape page content of collected URLs to get rental listing data 
 for url in padmapper_scraper.urls:
     try:
-        if len(padmapper_listings) >= 100:
-            all_listings += padmapper_listings
-            current_df = pd.DataFrame(padmapper_listings, columns=table_columns)
-            all_listings_df = pd.concat([all_listings_df, current_df], ignore_index=True)
-            # on every 100 listings read, write them to the excel sheet (in case of crash)
-            all_listings_df.to_excel(listings_path, index=False)
-            padmapper_listings.clear()
+        # on every 100 listings read, write them to the excel sheet (in case of crash)
+        if len(current_units) >= 100:
+            all_units += current_units
+            # current_df = pd.DataFrame(current_units, columns=table_columns)
+            # all_units_df = pd.concat([all_units_df, current_df], ignore_index=True)
+            all_units_df = pd.DataFrame(all_units, columns=table_columns)
+            all_units_df.to_excel(listings_path, index=False)
+            current_units.clear()
         rental_listing_data = padmapper_scraper.get_rental_listing_data(get_rental_data_driver, url)
         if rental_listing_data:
-            padmapper_listings += rental_listing_data
+            current_units += rental_listing_data
     except:
         continue
 
-# Append remaining padmapper listings to all_listings
-all_listings += padmapper_listings
+# Append remaining padmapper listings to all_units
+all_units += current_units
 
 # ------------------------------------------------------------
 
-current_df = pd.DataFrame(padmapper_listings, columns=table_columns)
-all_listings_df = pd.concat([all_listings_df, current_df], ignore_index=True)
+all_listings_df = all_units_df = pd.DataFrame(all_units, columns=table_columns)
 
 all_listings_df.to_excel(listings_path, index=False)
 
@@ -84,16 +81,3 @@ all_listings_df.to_excel(listings_path, index=False)
 get_rental_data_driver.quit()
 
 # -------------------------------------------------------------
-
-# List the blobs in the container
-# print(f"Listing blobs in the container '{container_name}':")
-# try:
-#    blob_list = container_client.list_blobs()
-#    for blob in blob_list:
-#        print(blob.name)
-# except Exception as e:
-#    print(f"An error occurred while listing blobs: {e}")
-
- # Create the container if it doesn't exist
-
-# upload_file_to_blob(listings_path, blob_name, container_client)
