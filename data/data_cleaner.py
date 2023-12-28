@@ -83,7 +83,6 @@ def get_cleaned_data(df):
     # Flatten out the building amenities into one-hot encoded columns
     df_exploded = df.explode(TableHeaders.BUILDING_AMENITIES.value)
     dummies = pd.get_dummies(df_exploded, columns=[TableHeaders.BUILDING_AMENITIES.value], prefix='', prefix_sep='', dtype=int)
-    print(dummies.index)
     df = dummies.groupby(dummies.index).max()
 
     # Flatten out the unit amenities into one-hot encoded columns
