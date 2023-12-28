@@ -58,3 +58,34 @@ class City():
     
     def add_building(self, building: Building):
         self.buildings.append(building)
+
+
+def convert_df_to_classes(df: pd.DataFrame) -> list[City]:
+    cities: list[City] = []
+
+    # Group data by city to extract city specific insights
+    city_groups = df.groupby(TableHeaders.CITY.value)
+
+    for city_name, city_df in city_groups:
+        current_city = City(city_name)
+        # Group city data by building name to extract building specific insights
+        building_groups = city_df.groupby(TableHeaders.BUILDING.value)
+
+        # Create an intermediary tuple to record number of available units and sort buildings accordingly
+        # When displaying overarching insights for an area, buildings with more units will be more informational
+        buildings_tuples = [(building, building_df, len(building_df)) for building, building_df in building_groups]
+        buildings_tuples.sort(key = lambda x: x[2], reverse=True)
+
+        for building_name, building_df, num_units in buildings_tuples:
+
+            current_building: Building = Building(building_name, city_name)
+            # Group by bed type within this building
+            bed_groups = building_df.groupby(TableHeaders.BED.value)
+            for unit_type, unit_type_df in bed_groups:
+                current_building.add_unit_type(unit_type=unit_type, unit_type_df=unit_type_df)
+
+            current_city.add_building(current_building) 
+
+        cities.append(current_city)
+
+    return cities

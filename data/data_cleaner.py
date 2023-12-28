@@ -79,7 +79,6 @@ def get_cleaned_data(df):
     df[TableHeaders.PETS.value] = df[TableHeaders.PETS.value].apply(parse_pets_value)
     df[TableHeaders.BUILDING_AMENITIES.value] = df[TableHeaders.BUILDING_AMENITIES.value].apply(parse_building_amenities)
     df[TableHeaders.UNIT_AMENITIES.value] = df[TableHeaders.UNIT_AMENITIES.value].apply(parse_unit_amenities)
-
     # Flatten out the building amenities into one-hot encoded columns
     df_exploded = df.explode(TableHeaders.BUILDING_AMENITIES.value)
     dummies = pd.get_dummies(df_exploded, columns=[TableHeaders.BUILDING_AMENITIES.value], prefix='', prefix_sep='', dtype=int)
@@ -92,5 +91,8 @@ def get_cleaned_data(df):
 
     # Remove nulls
     df.dropna(inplace=True)
+
+    # Filter out listings with prices greater than $5K - these extreme values are outliers
+    df = df[df[TableHeaders.PRICE.value] < 5000]
 
     return df
