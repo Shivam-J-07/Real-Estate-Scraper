@@ -9,23 +9,6 @@ from backend.dependencies import get_db
 from data.data_cleaner import get_cleaned_df
 from constants import TableHeaders, UnitAmenities, BuildingAmenities
 
-def add_unit_to_db(row, building_id: int, db: Session):
-    unit = UnitCreate(
-        buidling_id=building_id,
-        bed=row[TableHeaders.BED.value],
-        bath=row[TableHeaders.BATH.value],
-        sqft=row[TableHeaders.SQFT.value],
-        price=row[TableHeaders.PRICE.value],
-        air_conditioning=row[UnitAmenities.AIR_CONDITIONING.value],
-        balcony=row[UnitAmenities.BALCONY.value],
-        furnished=row[UnitAmenities.FURNISHED.value],
-        hardwood_floor=row[UnitAmenities.HARDWOOD_FLOOR.value],
-        high_ceilings=row[UnitAmenities.HIGH_CEILINGS.value],
-        in_unit_laundry=row[UnitAmenities.IN_UNIT_LAUNDRY.value]
-    )
-    create_unit(db, unit)
-
-
 def add_listing_data_to_db(db: Session, df: pd.DataFrame):
     
     # Group listings by building and add individual building followed by associated units
