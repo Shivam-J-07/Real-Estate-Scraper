@@ -7,8 +7,7 @@ import pickle
 
 from bs4 import BeautifulSoup
 from constants import TableHeaders
-from utils import (
-    get_headers,
+from data.utils import (
     get_absolute_url, 
     generate_time_gap, 
     match_address, 

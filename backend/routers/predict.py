@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 import joblib
 import numpy
-from pydantic_schemas import Predict
+from backend.pydantic_schemas import Predict
 
 router = APIRouter(
     prefix="/predict",

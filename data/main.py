@@ -1,21 +1,15 @@
 
 import os
-import sys
 
-parent_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir = os.path.dirname(parent_dir)
-
-sys.path.append(root_dir)
-sys.path.append(parent_dir)
-
-import requests
-from ..constants import (
+from constants import (
     table_columns,
 )
-from configs import (
+
+from data.configs import (
     create_chrome_driver
 )
-from scrapers import PadmapperScraper
+
+from data.scrapers import PadmapperScraper
 
 from selenium.webdriver.chrome.webdriver import WebDriver
 

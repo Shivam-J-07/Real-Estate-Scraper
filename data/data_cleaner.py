@@ -1,7 +1,6 @@
 import pandas as pd
 import re
 import os
-import sys
 from constants import TableHeaders, UnitAmenitiesDict, BuildingAmenitiesDict
 
 MINIMUM_SQFT_THRESHOLD = 200
@@ -69,6 +68,17 @@ def parse_pets_value(pets_value):
     pets_value = pets_value.lower()
     return 1 if any(pet in pets_value for pet in ['dog', 'cat', 'yes']) else 0
 
+def get_raw_df() -> pd.DataFrame:
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    listings_path = os.path.join(current_dir, "rental_listings.xlsx")
+    return pd.read_excel(listings_path)
+
+def get_cleaned_df() -> pd.DataFrame:
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    cleaned_listings_path = os.path.join(current_dir, "cleaned_listings.xlsx")
+    cleaned_df = get_cleaned_data(get_raw_df())
+    cleaned_df.to_excel(cleaned_listings_path, index=False)
+    return cleaned_df
 
 # Main function to process the data
 def get_cleaned_data(df):

@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 
-from routers import predict
-from routers import analysis
+from backend import db_models
+from backend.database import engine
+from backend.routers import predict
+from backend.routers import analysis
+
+db_models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
