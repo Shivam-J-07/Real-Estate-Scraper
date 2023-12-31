@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 class Unit(Base):
     __tablename__ = "units"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True, unique=True)
-    building_id = Column(Integer, ForeignKey("buildings.id"), unique=True)
+    building_id = Column(Integer, ForeignKey("buildings.id"))
     bed = Column(Integer, index=True)
     bath = Column(Float)
     sqft = Column(Float)
@@ -22,7 +22,7 @@ class Unit(Base):
 class Building(Base):
     __tablename__ = "buildings"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True, unique=True)
-    name = Column(String, primary_key=True, index=True)
+    name = Column(String, primary_key=True, index=True, unique=True)
     address = Column(String, primary_key=True, index=True)
     city = Column(String, primary_key=True, index=True)
     lat = Column(Float)
