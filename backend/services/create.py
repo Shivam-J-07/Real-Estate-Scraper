@@ -8,7 +8,7 @@ from backend.services.search import get_building_by_name
 from data.data_cleaner import get_cleaned_df
 
 
-def toBuilding(row) -> Building:
+def row_to_building(row) -> Building:
     return Building(
         name=row[TableHeaders.BUILDING.value],
         address=row[TableHeaders.ADDRESS.value],
@@ -26,7 +26,7 @@ def toBuilding(row) -> Building:
     )
 
 
-def toUnit(row, building_id) -> Unit:
+def row_to_unit(row, building_id) -> Unit:
     return Unit(
         building_id=building_id,
         bed=row[TableHeaders.BED.value],
@@ -44,15 +44,15 @@ def toUnit(row, building_id) -> Unit:
 
 def add_listing_data_to_db(db: Session, df: pd.DataFrame):
     try:
-		# First add all Building objects by getting all rows with a unique building and converting each to a Building object
+        # First add all Building objects by getting all rows with a unique building and converting each to a Building object
         buildings = df.drop_duplicates(
-        subset=TableHeaders.BUILDING.value, keep='first').apply(toBuilding, axis=1)
+            subset=TableHeaders.BUILDING.value, keep='first').apply(row_to_building, axis=1)
         create_buildings(db, buildings)
         # Now add all Unit objects associated with each building
         building_groups = df.groupby(TableHeaders.BUILDING.value)
         for building_name, building_df in building_groups:
             building = get_building_by_name(db, building_name)
-            units = building_df.apply(toUnit, args=(building.id,), axis=1)
+            units = building_df.apply(row_to_unit, args=(building.id,), axis=1)
             create_units(db, units)
     except Exception as e:
         print(f"An error occurred: {e}")
