@@ -2,7 +2,7 @@
 import os
 
 from constants import (
-    table_columns,
+    table_columns, TableHeaders
 )
 
 from data.configs import (
@@ -14,6 +14,8 @@ from data.scrapers import PadmapperScraper
 from selenium.webdriver.chrome.webdriver import WebDriver
 
 import pandas as pd
+
+from datetime import datetime
 
 # Webdriver --------------------------------------------------
 
@@ -65,6 +67,8 @@ for url in padmapper_scraper.urls:
             all_units_df.to_excel(listings_path, index=False)
             current_units.clear()
         rental_listing_data = padmapper_scraper.get_rental_listing_data(get_rental_data_driver, url)
+        # print(rental_listing_data[0][TableHeaders.CITY.value])
+        # print(table_columns)
         if rental_listing_data:
             current_units += rental_listing_data
     except:
@@ -75,9 +79,11 @@ all_units += current_units
 
 # ------------------------------------------------------------
 
-all_listings_df = all_units_df = pd.DataFrame(all_units, columns=table_columns)
+all_units_df: pd.DataFrame = pd.DataFrame(all_units, columns=table_columns)
 
-all_listings_df.to_excel(listings_path, index=False)
+all_units_df[TableHeaders.DATE.value] = all_units_df[TableHeaders.DATE.value].fillna(datetime.now())
+
+all_units_df.to_excel(listings_path, index=False)
 
 # Close the get_rental_data_driver
 get_rental_data_driver.quit()

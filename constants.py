@@ -2,6 +2,7 @@ from enum import Enum
 
 class TableHeaders(Enum):
     BUILDING = 'Building'
+    NEIGHBOURHOOD = 'Neighbourhood'
     ADDRESS = 'Address'
     CITY = 'City'
     LISTING = 'Listing'
@@ -14,6 +15,7 @@ class TableHeaders(Enum):
     PETS = 'Pets'
     LAT = 'Latitude'
     LON = 'Longitude'
+    DATE = 'Date'
 
 class UnitAmenities(Enum):
     BALCONY = 'Balcony'
@@ -111,17 +113,4 @@ locations = [
     }
 ]
 
-table_columns = [
-    TableHeaders.BUILDING.value,
-    TableHeaders.ADDRESS.value,
-    TableHeaders.LISTING.value,
-    TableHeaders.BED.value,
-    TableHeaders.BATH.value,
-    TableHeaders.SQFT.value,
-    TableHeaders.PRICE.value,
-    TableHeaders.UNIT_AMENITIES.value,
-    TableHeaders.BUILDING_AMENITIES.value,
-    TableHeaders.PETS.value,
-    TableHeaders.LAT.value,
-    TableHeaders.LON.value
-]
+table_columns = [table_header.value for table_header in TableHeaders]

@@ -1,6 +1,7 @@
 from backend.database import Base
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 class Unit(Base):
     __tablename__ = "units"
@@ -16,17 +17,18 @@ class Unit(Base):
     hardwood_floor = Column(Boolean, default=False)
     high_ceilings = Column(Boolean, default=False)
     in_unit_laundry = Column(Boolean, default=False)
+    timestamp = Column(DateTime, default=datetime.now())
 
     building = relationship("Building", back_populates="units")
 
 class Building(Base):
     __tablename__ = "buildings"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True, unique=True)
-    name = Column(String, primary_key=True, index=True, unique=True)
-    address = Column(String, primary_key=True, index=True)
-    city = Column(String, primary_key=True, index=True)
-    lat = Column(Float)
-    lon = Column(Float)
+    name = Column(String, index=True)
+    address = Column(String, index=True)
+    city = Column(String, index=True)
+    lat = Column(Float, primary_key=True)
+    lon = Column(Float, primary_key=True)
     controlled_access = Column(Boolean, default=False)
     fitness_center = Column(Boolean, default=False)
     outdoor_space = Column(Boolean, default=False)

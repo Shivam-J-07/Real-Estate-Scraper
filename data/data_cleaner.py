@@ -99,10 +99,15 @@ def get_cleaned_data(df):
     dummies = pd.get_dummies(df_exploded, columns=[TableHeaders.UNIT_AMENITIES.value], prefix='', prefix_sep='', dtype=int)
     df = dummies.groupby(dummies.index).max()
 
+    # List of columns to check for NaN values
+    na_columns_to_drop = [TableHeaders.BUILDING.value, TableHeaders.CITY.value, TableHeaders.BED.value, TableHeaders.SQFT.value, TableHeaders.PRICE.value]  # replace with your actual column names
+
     # Remove nulls
-    df.dropna(inplace=True)
+    df.dropna(subset=na_columns_to_drop, inplace=True)
 
     # Filter out listings with prices greater than $5K - these extreme values are outliers
     df = df[df[TableHeaders.PRICE.value] < 5000]
 
     return df
+
+get_cleaned_df()

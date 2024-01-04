@@ -5,8 +5,8 @@ from backend.db_models import Building, Unit
 session = SessionLocal()
 
 # Clear ALL data from ALL tables
-session.query(Building).delete()
 session.query(Unit).delete()
+session.query(Building).delete()
 
 # Recreate tables after dropping them (if needed)
 Base.metadata.create_all(engine)

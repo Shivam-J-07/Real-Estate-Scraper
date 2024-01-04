@@ -216,7 +216,7 @@ class PadmapperScraper(BaseScraper):
         # Parse the HTML with Beautiful Soup
         soup = BeautifulSoup(link_html_content, 'html.parser')
         
-        building_title_text, price_text, bed_text, bath_text, sqft_text, address_text, pets_text, lat_text, lon_text, city_text = DataExtractor.extract_building_details(soup)
+        building_title_text, neighborhood_title_text, price_text, bed_text, bath_text, sqft_text, address_text, pets_text, lat_text, lon_text, city_text = DataExtractor.extract_building_details(soup)
 
         unit_amenities_text, building_amenities_text = DataExtractor.extract_amenities(soup)
 
@@ -231,21 +231,24 @@ class PadmapperScraper(BaseScraper):
                 TableHeaders.SQFT.value: sqft_text,
             }
         ]
+
         rental_listing_units = []
+
 		# Concatenate each row of rental unit data with columns for building and rental unit amenities
         for unit_data in all_units_data:
+            unit_data[TableHeaders.BUILDING.value] = building_title_text
+            unit_data[TableHeaders.NEIGHBOURHOOD.value] = neighborhood_title_text
             unit_data[TableHeaders.PETS.value] = pets_text
             unit_data[TableHeaders.UNIT_AMENITIES.value] = unit_amenities_text
             unit_data[TableHeaders.BUILDING_AMENITIES.value] = building_amenities_text
             unit_data[TableHeaders.ADDRESS.value] = address_text
-            unit_data[TableHeaders.BUILDING.value] = building_title_text
             unit_data[TableHeaders.CITY.value] = city_text
             unit_data[TableHeaders.LAT.value] = lat_text
             unit_data[TableHeaders.LON.value] = lon_text
             rental_listing_units.append(unit_data)
 
         self.listings += rental_listing_units
-        print(f"Extracted {len(rental_listing_units)} units")
+        print(f"Extracted {len(rental_listing_units)} units in {city_text}")
         print(f"Total units: {len(self.listings)}")
         with open('listings.pkl', 'wb') as file:
             pickle.dump(self.listings, file)
@@ -266,6 +269,10 @@ class DataExtractor():
         building_title = soup.find('h1', class_=lambda cls: cls and 'FullDetail_street_' in cls)
         building_title_text = re.split(r'[^\w ]+',  building_title.get_text())[0] if building_title else ""
 
+        neighborhood_title_sep = soup.find('span', class_=lambda cls: cls and 'FullDetail_cityStateDivider_' in cls)
+        neighborhood_title = neighborhood_title_sep.find_next_sibling('a', class_=lambda cls: cls and 'FullDetail_cityStateLink_' in cls)
+        neighborhood_title_text = re.split(r'[^\w ]+',  neighborhood_title.get_text())[0] if neighborhood_title else ""
+
         details = soup.find('div', class_=lambda cls: cls and 'SummaryTable_summaryTable_' in cls)
 
         [price_text, bed_text, bath_text, sqft_text, address_text, pets_text] = DataExtractor.extract_summary_table(details)
@@ -282,7 +289,7 @@ class DataExtractor():
         city_tag = soup.find('meta', {'name': 'place:locality'})
         city_text = city_tag['content'] if city_tag else ""
 
-        return (building_title_text, price_text, bed_text, bath_text, sqft_text, address_text, pets_text, lat_text, lon_text, city_text)
+        return (building_title_text, neighborhood_title_text, price_text, bed_text, bath_text, sqft_text, address_text, pets_text, lat_text, lon_text, city_text)
 
     @staticmethod
     def extract_summary_table(soup: BeautifulSoup) -> list:
