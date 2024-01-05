@@ -1,18 +1,21 @@
 import os
 import requests
 from datetime import datetime
+from urllib.parse import urljoin
+from dotenv import load_dotenv
 
 from data.main import extract_raw_data
 from data.data_cleaner import get_cleaned_df
 
 from model.model import train_model
 
+load_dotenv()
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
 
 current_timestamp = datetime.now().strftime("%d-%m-%Y")
 
-cleaned_data_files = os.listdir("data/cleaned_data/")
+cleaned_data_files = os.listdir(os.path.join('data', 'cleaned_data'))
 # Check if there's a cleaned_data excel sheet in the data/cleaned_data dir containing the current year and month
 monthly_data_exists = any(datetime.now().strftime("%m-%Y") in filename for filename in cleaned_data_files)
 
@@ -51,7 +54,7 @@ except Exception as e:
 # Push the acquired data to Neon DB ---------------------------------------------------------
 
 # API endpoint URL
-url = 'http://localhost:8000/analysis'
+API_URL = urljoin(os.getenv("API_URL"), "analysis")
 
 # Payload (data to be sent in the POST request)
 payload = cleaned_data_df.copy()
@@ -60,7 +63,7 @@ payload = payload.astype(str)
 payload = payload.to_dict(orient='records')
 
 # Sending a POST request to the API
-response = requests.post(url, json=payload)
+response = requests.post(API_URL, json=payload)
 
 # Handling the response
 if response.status_code == 201:
