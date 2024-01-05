@@ -7,6 +7,8 @@ from backend.dependencies import get_db
 from backend.services.search import get_building_units_by_timestamp, get_building_by_lat_lon
 from data.data_cleaner import get_cleaned_df
 
+from .delete import delete_units_by_timestamp
+
 
 def row_to_building(row, db: Session) -> Building:
     building = get_building_by_lat_lon(
@@ -55,23 +57,30 @@ def add_listing_data_to_db(db: Session, df: pd.DataFrame):
         building_groups = df.groupby([TableHeaders.LAT.value, TableHeaders.LON.value])
         for (lat, lon), building_df in building_groups:
             building = get_building_by_lat_lon(db, lat=lat, lon=lon)
+            timestamp = building_df[TableHeaders.DATE.value].iloc[0]
             existing_units = get_building_units_by_timestamp(db, building.id, building_df[TableHeaders.DATE.value].iloc[0]).first()
             if existing_units is not None:
+                print(f"Units for building {building.id} for timestamp {timestamp} already exist")
                 continue
             units = building_df.apply(row_to_unit, args=(building.id,), axis=1)
             create_units(db, units)
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An error occurred while adding listing data to the database: {e}")
+        # Delete all units for the current date timestamp
+        timestamp = df[TableHeaders.DATE.value].iloc[0]
+        delete_units_by_timestamp(db=db, timestamp=timestamp)
+        raise e
 
 
 def create_buildings(db: Session, buildings: list[Building]):
     db.bulk_save_objects(buildings)
     db.commit()
+    print(f"Created buildings in db")
+
 
 
 def create_units(db: Session, units: list[Unit]):
+    building_id = units[0].building_id
     db.bulk_save_objects(units)
     db.commit()
-
-
-add_listing_data_to_db(get_db(), get_cleaned_df())
+    print(f"Created units in db for building with id {building_id}")

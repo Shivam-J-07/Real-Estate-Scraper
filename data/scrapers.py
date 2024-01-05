@@ -192,9 +192,15 @@ class PadmapperScraper(BaseScraper):
             web_driver (webdriver): The Selenium WebDriver to use for scraping.
             url (str): URL of the listing page to scrape.
         """
+
         try:
             if not self._try_load_page(web_driver, url):
                 return []  # Skip processing this URL and continue with others
+            
+            # Wait for a summary table before proceeding
+            WebDriverWait(web_driver, 5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "div[class*='SummaryTable_']"))
+            )
             
             is_single_unit = self._process_floorplan_panels(web_driver)
             link_html_content = web_driver.page_source

@@ -2,8 +2,6 @@ __pycache__/
 
 env
 .env
-data/*.xlsx
-model/*.xlsx
 .DS_Store
 
 .ipynb_checkpoints

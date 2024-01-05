@@ -68,16 +68,12 @@ def parse_pets_value(pets_value):
     pets_value = pets_value.lower()
     return 1 if any(pet in pets_value for pet in ['dog', 'cat', 'yes']) else 0
 
-def get_raw_df() -> pd.DataFrame:
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    listings_path = os.path.join(current_dir, "rental_listings.xlsx")
-    return pd.read_excel(listings_path)
+def get_raw_df(raw_filepath: str) -> pd.DataFrame:
+    return pd.read_excel(raw_filepath)
 
-def get_cleaned_df() -> pd.DataFrame:
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    cleaned_listings_path = os.path.join(current_dir, "cleaned_listings.xlsx")
-    cleaned_df = get_cleaned_data(get_raw_df())
-    cleaned_df.to_excel(cleaned_listings_path, index=False)
+def get_cleaned_df(raw_filepath: str, cleaned_filepath: str) -> pd.DataFrame:
+    cleaned_df = get_cleaned_data(get_raw_df(raw_filepath))
+    cleaned_df.to_excel(cleaned_filepath, index=False)
     return cleaned_df
 
 # Main function to process the data
@@ -100,7 +96,7 @@ def get_cleaned_data(df):
     df = dummies.groupby(dummies.index).max()
 
     # List of columns to check for NaN values
-    na_columns_to_drop = [TableHeaders.BUILDING.value, TableHeaders.CITY.value, TableHeaders.BED.value, TableHeaders.SQFT.value, TableHeaders.PRICE.value]  # replace with your actual column names
+    na_columns_to_drop = [TableHeaders.BUILDING.value, TableHeaders.CITY.value, TableHeaders.BED.value, TableHeaders.BATH.value, TableHeaders.SQFT.value, TableHeaders.PRICE.value]  # replace with your actual column names
 
     # Remove nulls
     df.dropna(subset=na_columns_to_drop, inplace=True)
@@ -109,5 +105,3 @@ def get_cleaned_data(df):
     df = df[df[TableHeaders.PRICE.value] < 5000]
 
     return df
-
-get_cleaned_df()

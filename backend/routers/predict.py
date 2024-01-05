@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-import joblib
+from model.model import get_model
 import numpy
 from backend.pydantic_schemas import Predict
 
@@ -12,7 +12,7 @@ router = APIRouter(
 
 @router.post("")
 def get_prediction(request: Predict.PredictRequestBody):
-    model = joblib.load("random_forest_model.joblib")
+    model = get_model()
     input = numpy.array(
         [
             request.bed,
