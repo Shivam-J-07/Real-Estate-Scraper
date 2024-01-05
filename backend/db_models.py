@@ -1,11 +1,13 @@
-from backend.database import Base
+from database import Base
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
+
 class Unit(Base):
     __tablename__ = "units"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True, unique=True)
+    id = Column(Integer, primary_key=True, index=True,
+                autoincrement=True, unique=True)
     building_id = Column(Integer, ForeignKey("buildings.id"))
     bed = Column(Integer, index=True)
     bath = Column(Float)
@@ -21,9 +23,11 @@ class Unit(Base):
 
     building = relationship("Building", back_populates="units")
 
+
 class Building(Base):
     __tablename__ = "buildings"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True, unique=True)
+    id = Column(Integer, primary_key=True, index=True,
+                autoincrement=True, unique=True)
     name = Column(String, index=True)
     address = Column(String, index=True)
     city = Column(String, index=True)
@@ -37,6 +41,5 @@ class Building(Base):
     storage = Column(Boolean, default=False)
     swimming_pool = Column(Boolean, default=False)
     pets = Column(Boolean, default=False)
-    
+
     units = relationship("Unit", back_populates="building")
-    

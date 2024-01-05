@@ -1,10 +1,12 @@
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-from backend.db_models import Unit
+from db_models import Unit
+
 
 def delete_units_by_timestamp(db: Session, timestamp: datetime):
     try:
+        print("Deleting units by timestamp", timestamp)
         db.query(Unit).filter(Unit.timestamp == timestamp).delete()
         db.commit()
     except Exception as e:

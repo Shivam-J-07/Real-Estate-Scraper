@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from backend.pydantic_schemas.Unit import Unit
+from pydantic_schemas.Unit import Unit
+
 
 class BuildingBase(BaseModel):
     name: str
@@ -16,8 +17,10 @@ class BuildingBase(BaseModel):
     storage: bool = False
     swimming_pool: bool = False
 
+
 class BuildingCreate(BuildingBase):
     pass
+
 
 class Building(BuildingBase):
     id: int

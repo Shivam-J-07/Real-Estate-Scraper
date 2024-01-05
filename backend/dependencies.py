@@ -1,8 +1,9 @@
-from backend.database import SessionLocal
+from database import SessionLocal
+
 
 def get_db():
     db = SessionLocal()
     try:
-        return db
+        yield db
     finally:
         db.close()

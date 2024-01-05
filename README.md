@@ -82,5 +82,5 @@ python -m main
 To start the backend API from the root directory, run:
 
 ```bash
-python -m uvicorn backend.app:app --reload
+python -m uvicorn app:app --reload
 ```

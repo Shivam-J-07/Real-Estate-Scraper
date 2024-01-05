@@ -1,5 +1,5 @@
-from backend.database import engine, Base, SessionLocal
-from backend.db_models import Building, Unit
+from database import engine, Base, SessionLocal
+from db_models import Building, Unit
 
 # Create a session
 session = SessionLocal()

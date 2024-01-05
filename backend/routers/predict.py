@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from model.model import get_model
+import joblib
 import numpy
-from backend.pydantic_schemas import Predict
+from pydantic_schemas import Predict
 
 router = APIRouter(
     prefix="/predict",
@@ -12,7 +12,7 @@ router = APIRouter(
 
 @router.post("")
 def get_prediction(request: Predict.PredictRequestBody):
-    model = get_model()
+    model = joblib.load("model.joblib")
     input = numpy.array(
         [
             request.bed,

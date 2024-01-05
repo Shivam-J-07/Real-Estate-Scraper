@@ -2,12 +2,11 @@ import pandas as pd
 from sqlalchemy.orm import Session
 
 from constants import TableHeaders, UnitAmenities, BuildingAmenities
-from backend.db_models import Building, Unit
-from backend.dependencies import get_db
-from backend.services.search import get_building_units_by_timestamp, get_building_by_lat_lon
-from data.data_cleaner import get_cleaned_df
+from db_models import Building, Unit
+from dependencies import get_db
+from services.search import get_building_units_by_timestamp, get_building_by_lat_lon
+from services.delete import delete_units_by_timestamp
 
-from .delete import delete_units_by_timestamp
 
 
 def row_to_building(row, db: Session) -> Building:
@@ -54,18 +53,22 @@ def add_listing_data_to_db(db: Session, df: pd.DataFrame):
             subset=[TableHeaders.LAT.value, TableHeaders.LON.value], keep='first').apply(row_to_building, args=(db,), axis=1).dropna()
         create_buildings(db, buildings)
         # Now add all Unit objects associated with each building
-        building_groups = df.groupby([TableHeaders.LAT.value, TableHeaders.LON.value])
+        building_groups = df.groupby(
+            [TableHeaders.LAT.value, TableHeaders.LON.value])
         for (lat, lon), building_df in building_groups:
             building = get_building_by_lat_lon(db, lat=lat, lon=lon)
             timestamp = building_df[TableHeaders.DATE.value].iloc[0]
-            existing_units = get_building_units_by_timestamp(db, building.id, building_df[TableHeaders.DATE.value].iloc[0]).first()
+            existing_units = get_building_units_by_timestamp(
+                db, building.id, building_df[TableHeaders.DATE.value].iloc[0]).first()
             if existing_units is not None:
-                print(f"Units for building {building.id} for timestamp {timestamp} already exist")
+                print(
+                    f"Units for building {building.id} for timestamp {timestamp} already exist")
                 continue
             units = building_df.apply(row_to_unit, args=(building.id,), axis=1)
-            create_units(db, units)
+            create_units(db, units, building.id)
     except Exception as e:
-        print(f"An error occurred while adding listing data to the database: {e}")
+        print(
+            f"An error occurred while adding listing data to the database, rolling back entries")
         # Delete all units for the current date timestamp
         timestamp = df[TableHeaders.DATE.value].iloc[0]
         delete_units_by_timestamp(db=db, timestamp=timestamp)
@@ -78,9 +81,7 @@ def create_buildings(db: Session, buildings: list[Building]):
     print(f"Created buildings in db")
 
 
-
-def create_units(db: Session, units: list[Unit]):
-    building_id = units[0].building_id
+def create_units(db: Session, units: pd.DataFrame, building_id: int):
     db.bulk_save_objects(units)
     db.commit()
     print(f"Created units in db for building with id {building_id}")
