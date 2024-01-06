@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-from db_models import Unit
+from app.db_models import Unit
 
 
 def delete_units_by_timestamp(db: Session, timestamp: datetime):

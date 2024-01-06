@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 import pandas as pd
 from sqlalchemy.orm import Session
-from services.create import add_listing_data_to_db
-from dependencies import get_db
-from pydantic_schemas.Analysis import AddListing
+from app.services.create import add_listing_data_to_db
+from app.dependencies import get_db
+from app.pydantic_schemas.Analysis import AddListing
 
 router = APIRouter(
     prefix="/analysis",

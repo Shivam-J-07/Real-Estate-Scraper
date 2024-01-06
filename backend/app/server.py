@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 
-from database import engine, Base
-from routers import predict
-from routers import analysis
+from app.routers import predict
+from app.routers import analysis
 
 app = FastAPI()
 

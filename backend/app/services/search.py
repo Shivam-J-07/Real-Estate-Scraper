@@ -1,8 +1,7 @@
 from datetime import datetime
-import pandas as pd
 from sqlalchemy.orm import Session
 
-from db_models import Building, Unit
+from app.db_models import Building, Unit
 
 
 def get_building_by_name(db: Session, name: str):

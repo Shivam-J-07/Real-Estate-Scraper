@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from pydantic_schemas.Unit import Unit
+from app.pydantic_schemas.Unit import Unit
 
 
 class BuildingBase(BaseModel):
