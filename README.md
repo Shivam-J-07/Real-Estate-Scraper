@@ -22,7 +22,6 @@ These terms that appear throughout the project are defined explicitly for the re
 | Unit amenities    | Balcony, In Unit Laundry, Air Conditioning, High Ceilings, Furnished, Hardwood Floor.               |
 | Building amenities| Controlled Access, Fitness Center, Swimming Pool, Roof Deck, Storage, Residents Lounge, Outdoor Space.|
 
-
 ## Setup
 
 This project runs on [Python 3](https://www.python.org/downloads/). Make sure you have a version of Python 3 installed.
@@ -71,6 +70,7 @@ This project uses a PostgreSQL database to store the extracted rental listing da
 ### Running the project
 
 Running `main.py` in the root directory will commence the data acquisition and model training process, which executes the following steps:
+
 1. Run the data scraper to acquire the rental listing data for the current month.
 2. Push the extracted unit and building details for each listing to your PostgreSQL DB.
 3. Re-train the model using the extracted data, then save the updated model as `model.joblib` where it will be utilized by the backend API.
@@ -79,8 +79,8 @@ Running `main.py` in the root directory will commence the data acquisition and m
 python -m main
 ```
 
-To start the backend API from the root directory, run:
+To start the backend API from the `backend` directory, run:
 
 ```bash
-python -m uvicorn app:app --reload
+python -m uvicorn app.server:app --reload
 ```
