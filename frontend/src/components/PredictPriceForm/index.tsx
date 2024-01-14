@@ -44,7 +44,7 @@ export default function PricePredictForm({
   };
 
   return (
-    <div className="max-w-lg flex flex-col gap-4 p-8 sm:overflow-y-auto sm:max-h-screen">
+    <div className="max-w-lg flex flex-col gap-4 p-8 sm:overflow-y-auto sm:max-h-screen text-sm">
       <h1 className="text-3xl font-medium">Rental Pricing Estimate</h1>
       <p className="text-sm">
         Provide the details for your rental unit listing and we&apos;ll give a price
