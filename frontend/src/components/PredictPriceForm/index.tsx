@@ -14,7 +14,7 @@ export default function PricePredictForm({
   } = useForm();
 
   const submitForm = async (data: FieldValues) => {
-	setIsLoading(true);
+    setIsLoading(true);
     if (process.env.NEXT_PUBLIC_API_URL) {
       const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/predict`;
       try {
@@ -40,15 +40,15 @@ export default function PricePredictForm({
         console.error("Error handling POST request:", error);
       }
     }
-	setIsLoading(false);
+    setIsLoading(false);
   };
 
   return (
     <div className="max-w-lg flex flex-col gap-4 p-8 sm:overflow-y-auto sm:max-h-screen">
       <h1 className="text-3xl font-medium">Rental Pricing Estimate</h1>
       <p className="text-sm">
-        Provide the details for your rental unit listing and we'll give a price
-        prediction for a monthly rate based on this month's rental listings.
+        Provide the details for your rental unit listing and we&apos;ll give a price
+        prediction for a monthly rate based on this month&apos;s rental listings.
       </p>
       <hr className="border-gray-300 dark:border-gray-600" />
       <div className="flex items-center gap-4">
@@ -162,7 +162,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 Controlled Access
               </label>
             </div>
@@ -173,7 +173,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 Fitness Center
               </label>
             </div>
@@ -184,7 +184,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 Outdoor Space
               </label>
             </div>
@@ -195,7 +195,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 Residents Lounge
               </label>
             </div>
@@ -206,7 +206,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 Roof Deck
               </label>
             </div>
@@ -217,7 +217,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 Storage
               </label>
             </div>
@@ -228,7 +228,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 Swimming Pool
               </label>
             </div>
@@ -247,7 +247,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 Air Conditioning
               </label>
             </div>
@@ -258,7 +258,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 Balcony
               </label>
             </div>
@@ -269,7 +269,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 Furnished
               </label>
             </div>
@@ -280,7 +280,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 Hardwood Floor
               </label>
             </div>
@@ -291,7 +291,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 High Ceilings
               </label>
             </div>
@@ -302,7 +302,7 @@ export default function PricePredictForm({
                 value=""
                 className="w-4 h-4"
               />
-              <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="ms-2 text-sm text-gray-900 dark:text-gray-300">
                 In Unit Laundry
               </label>
             </div>
