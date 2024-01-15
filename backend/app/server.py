@@ -8,7 +8,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
-    "https://rent-rite.vercel.app/",
+    "https://rent-rite.vercel.app",
 ]
 
 app.add_middleware(
