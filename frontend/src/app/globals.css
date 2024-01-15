@@ -24,5 +24,5 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb)); */
-  @apply bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-rose-100/20 to-teal-100/20 dark:bg-slate-950
+  @apply bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-rose-100/25 to-teal-100/25 dark:bg-slate-950
 }

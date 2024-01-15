@@ -21,7 +21,7 @@ monthly_data_exists = any(datetime.now().strftime("%m-%Y") in filename for filen
 
 raw_filepath = f"{current_dir}/data/raw_data/{current_timestamp}_rental_listings.xlsx"
 cleaned_filepath = f"{current_dir}/data/cleaned_data/{current_timestamp}_cleaned_listings.xlsx"
-model_filepath = f"{current_dir}/backend/model.joblib"
+model_filepath = f"{current_dir}/backend/app/model.joblib"
 model_archive_filepath = f"{current_dir}/model/model_archives/{current_timestamp}_model.joblib"
 
 # Extract raw data to acquire the rental listing data for the current month -----------------
