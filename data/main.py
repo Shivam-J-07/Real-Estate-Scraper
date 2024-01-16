@@ -39,15 +39,13 @@ def extract_raw_data(filepath: str, listing_urls: list[str]) -> pd.DataFrame:
             file.write('\n'.join(padmapper_scraper.urls))
         
         current_100_units = []
-        current_city_units = []
 
         # Scrape page content of collected URLs to get rental listing data 
         for url in padmapper_scraper.urls:
             try:
                 # on every 100 listings read, write them to the excel sheet (in case of crash)
                 if len(current_100_units) >= 100:
-                    current_city_units += current_100_units
-                    extracted_listing_data += current_city_units
+                    extracted_listing_data += current_100_units
                     extracted_listing_data_df = pd.DataFrame(extracted_listing_data, columns=table_columns)
                     extracted_listing_data_df.to_excel(filepath, index=False)
                     current_100_units.clear()

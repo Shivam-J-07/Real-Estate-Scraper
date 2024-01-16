@@ -11,7 +11,7 @@ class AddListing(BaseModel):
     bath: float
     sqft: float
     price: float
-    pets: float
+    pets: bool
     latitude: float
     longitude: float
     date: datetime

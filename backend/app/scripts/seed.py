@@ -9,7 +9,8 @@ session.query(Unit).delete()
 session.query(Building).delete()
 
 # Recreate tables after dropping them (if needed)
-Base.metadata.create_all(engine)
+# Base.metadata.drop_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 # Commit changes and close the session
 session.commit()
