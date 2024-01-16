@@ -12,7 +12,7 @@ export default function CheckboxToggle({
   value: boolean;
 }) {
   return (
-    <div className={`relative transition-all py-1 px-4 rounded-full text-center ${value ? "bg-sky-500 text-white" : "bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500"}`}>
+    <div className={`relative transition-all py-[0.1rem] px-4 rounded-full text-center border border-sky-500 ${value ? "bg-sky-500 text-white" : "text-sky-500 hover:bg-sky-500/25"}`}>
       <input
         {...register(fieldName)}
         className="absolute w-full opacity-0 cursor-pointer"
