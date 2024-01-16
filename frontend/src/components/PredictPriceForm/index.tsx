@@ -206,7 +206,7 @@ export default function PricePredictForm({
 
       <button
         onClick={handleSubmit(submitForm)}
-        className="self-center font-medium transition-all hover:bg-slate-600 bg-slate-500 w-fit px-8 py-2 text-white rounded-full"
+        className="self-center font-medium transition-all hover:bg-slate-600 bg-slate-500 dark:hover:bg-slate-400 w-fit px-8 py-2 text-white rounded-full"
       >
         Submit
       </button>
