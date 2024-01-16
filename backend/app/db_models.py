@@ -30,6 +30,7 @@ class Building(Base):
                 autoincrement=True, unique=True)
     name = Column(String, index=True)
     address = Column(String, index=True)
+    neighbourhood = Column(String, index=True)
     city = Column(String, index=True)
     lat = Column(Float, primary_key=True)
     lon = Column(Float, primary_key=True)

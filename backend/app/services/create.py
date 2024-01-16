@@ -14,6 +14,7 @@ def row_to_building(row, db: Session) -> Building:
     return Building(
         name=row[TableHeaders.BUILDING.value],
         address=row[TableHeaders.ADDRESS.value],
+        neighbourhood = row[TableHeaders.NEIGHBOURHOOD.value],
         city=row[TableHeaders.CITY.value],
         lat=row[TableHeaders.LAT.value],
         lon=row[TableHeaders.LON.value],
