@@ -16,7 +16,7 @@ export default function Header() {
     <header className="w-full px-8 py-4 flex flex-row justify-between text-sm font-medium">
       <div className="flex flex-row items-center gap-2">
         <Logo className="w-5" />
-        <span className="self-start">RentRite</span>
+        <span className="self-start hidden sm:block">RentRite</span>
       </div>
       <nav className="flex flex-row gap-4">
         <Link

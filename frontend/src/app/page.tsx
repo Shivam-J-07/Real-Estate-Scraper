@@ -9,7 +9,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   return (
-    <div className="flex-grow grid grid-cols-1 sm:grid-cols-2">
+    <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 h-full">
       <div className="flex flex-col justify-center items-center">
         <PricePredictForm
           setPredictedPrice={setPredictedPrice}
