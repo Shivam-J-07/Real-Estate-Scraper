@@ -1,8 +1,9 @@
 import { FieldValues, useForm } from "react-hook-form";
-import TextInput from "../Inputs/TextInput";
-import CheckboxToggle from "../Inputs/CheckboxToggle";
-import CheckboxInput from "../Inputs/CheckboxInput";
-import { fetchLatandLon } from "../../utils";
+import TextInput from "@/components/Inputs/TextInput";
+import CheckboxToggle from "@/components/Inputs/CheckboxToggle";
+import CheckboxInput from "@/components/Inputs/CheckboxInput";
+import { fetchLatandLon } from "@/utils";
+import defaultValues from "./defaultValues";
 
 export default function PricePredictForm({
   setPredictedPrice,
@@ -18,43 +19,63 @@ export default function PricePredictForm({
     handleSubmit,
     watch,
     getValues,
+    reset,
     formState: { errors },
   } = useForm();
 
   const submitForm = async (data: FieldValues) => {
     setIsLoading(true);
     setError(false);
+
+    if (!process.env.NEXT_PUBLIC_MAPS_API_KEY) {
+      console.error("Could not find Maps API key");
+      setError(true);
+      setIsLoading(false);
+      return;
+    }
+
     const { city, address, postal_code } = getValues();
     const { lat, lon } = await fetchLatandLon(
       `${address}, ${postal_code}, ${city}`
     );
-    if (process.env.NEXT_PUBLIC_API_URL && lat && lon) {
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/predict`;
-      try {
-        const apiResponse = await fetch(apiUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ...data, lat, lon }),
-        });
 
-        // Check if the request was successful
-        if (apiResponse.ok) {
-          const { price_prediction } = await apiResponse.json();
-          setPredictedPrice(Number(price_prediction));
-        } else {
-          console.error(
-            "Error making request to external API:",
-            apiResponse.statusText
-          );
-          setError(true);
-        }
-      } catch (error) {
-        console.error("Error handling POST request:", error);
+    if (!lat || !lon) {
+      console.error("Could not find lat or lon");
+      setError(true);
+      setIsLoading(false);
+      return;
+    }
+
+    if (!process.env.NEXT_PUBLIC_API_URL) {
+      console.error("Could not find API URL");
+      setError(true);
+      setIsLoading(false);
+      return;
+    }
+
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/predict`;
+    try {
+      const apiResponse = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...data, lat, lon }),
+      });
+
+      // Check if the request was successful
+      if (apiResponse.ok) {
+        const { price_prediction } = await apiResponse.json();
+        setPredictedPrice(Number(price_prediction));
+      } else {
+        console.error(
+          "Error making request to external API:",
+          apiResponse.statusText
+        );
         setError(true);
       }
-    } else {
+    } catch (error) {
+      console.error("Error handling POST request:", error);
       setError(true);
     }
     setIsLoading(false);
@@ -226,12 +247,20 @@ export default function PricePredictForm({
         </div>
       </div>
 
-      <button
-        onClick={handleSubmit(submitForm)}
-        className="my-2 self-center font-medium transition-all hover:bg-slate-700 bg-slate-600 dark:bg-slate-500 dark:hover:bg-slate-400 w-fit px-8 py-2 text-white rounded-full"
-      >
-        Submit
-      </button>
+      <div className="flex flex-row flex-wrap gap-2 items-center justify-center my-4">
+        <button
+          onClick={() => reset(defaultValues)}
+          className="self-center font-medium transition-all border border-slate-600 text-slate-600 hover:border-emerald-400 hover:text-emerald-400 dark:text-slate-400 dark:border-slate-400 dark:hover:border-emerald-300 dark:hover:text-emerald-300 w-fit px-4 py-2 rounded-full"
+        >
+          Try an Example
+        </button>
+        <button
+          onClick={handleSubmit(submitForm)}
+          className="self-center font-medium transition-all hover:bg-slate-800 bg-slate-600 dark:bg-slate-500 dark:hover:bg-slate-400 w-fit px-8 py-2 text-white rounded-full"
+        >
+          Submit
+        </button>
+      </div>
     </div>
   );
 }
