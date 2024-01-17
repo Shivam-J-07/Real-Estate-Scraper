@@ -1,26 +1,34 @@
-import { useEffect } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import TextInput from "../Inputs/TextInput";
 import CheckboxToggle from "../Inputs/CheckboxToggle";
 import CheckboxInput from "../Inputs/CheckboxInput";
+import { fetchLatandLon } from "../../utils";
 
 export default function PricePredictForm({
   setPredictedPrice,
   setIsLoading,
+  setError,
 }: {
   setPredictedPrice: React.Dispatch<React.SetStateAction<number>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const {
     register,
     handleSubmit,
     watch,
+    getValues,
     formState: { errors },
   } = useForm();
 
   const submitForm = async (data: FieldValues) => {
     setIsLoading(true);
-    if (process.env.NEXT_PUBLIC_API_URL) {
+    setError(false);
+    const { city, address, postal_code } = getValues();
+    const { lat, lon } = await fetchLatandLon(
+      `${address}, ${postal_code}, ${city}`
+    );
+    if (process.env.NEXT_PUBLIC_API_URL && lat && lon) {
       const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/predict`;
       try {
         const apiResponse = await fetch(apiUrl, {
@@ -28,7 +36,7 @@ export default function PricePredictForm({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify({ ...data, lat, lon }),
         });
 
         // Check if the request was successful
@@ -40,10 +48,14 @@ export default function PricePredictForm({
             "Error making request to external API:",
             apiResponse.statusText
           );
+          setError(true);
         }
       } catch (error) {
         console.error("Error handling POST request:", error);
+        setError(true);
       }
+    } else {
+      setError(true);
     }
     setIsLoading(false);
   };
@@ -89,21 +101,31 @@ export default function PricePredictForm({
       />
 
       <TextInput
-        fieldName="lat"
-        label="Latitude"
-        placeholder="Latitude"
-        requiredErrorMessage="Enter Latitude"
-        type="number"
+        fieldName="city"
+        label="City"
+        placeholder="City"
+        requiredErrorMessage="Enter City"
+        type="string"
         register={register}
         errors={errors}
       />
 
       <TextInput
-        fieldName="lon"
-        label="Longitude"
-        placeholder="Longitude"
-        requiredErrorMessage="Enter Longitude"
-        type="number"
+        fieldName="postal_code"
+        label="Postal Code"
+        placeholder="Postal Code"
+        requiredErrorMessage="Enter Postal Code"
+        type="string"
+        register={register}
+        errors={errors}
+      />
+
+      <TextInput
+        fieldName="address"
+        label="Address"
+        placeholder="Address"
+        requiredErrorMessage="Enter Address"
+        type="string"
         register={register}
         errors={errors}
       />
