@@ -1,19 +1,15 @@
+"use client"
+
 import { FieldValues, useForm } from "react-hook-form";
 import TextInput from "@/components/Inputs/TextInput";
 import CheckboxToggle from "@/components/Inputs/CheckboxToggle";
 import CheckboxInput from "@/components/Inputs/CheckboxInput";
+import Loading from "@/components/Icons/Loading";
 import { fetchLatandLon } from "@/utils";
 import defaultValues from "./defaultValues";
+import { useState } from "react";
 
-export default function PricePredictForm({
-  setPredictedPrice,
-  setIsLoading,
-  setError,
-}: {
-  setPredictedPrice: React.Dispatch<React.SetStateAction<number>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setError: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+export default function PricePredictForm() {
   const {
     register,
     handleSubmit,
@@ -22,6 +18,10 @@ export default function PricePredictForm({
     reset,
     formState: { errors },
   } = useForm();
+
+  const [predictedPrice, setPredictedPrice] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
 
   const submitForm = async (data: FieldValues) => {
     setIsLoading(true);
@@ -82,7 +82,7 @@ export default function PricePredictForm({
   };
 
   return (
-    <div className="max-w-lg flex flex-col gap-4 p-8 text-sm">
+    <div className="max-w-2xl flex flex-col gap-4 p-8 text-sm">
       <h1 className="text-3xl font-medium">Rental Pricing Estimate</h1>
       <p className="text-sm">
         Provide the details for your rental unit listing and we&apos;ll give a
@@ -90,6 +90,26 @@ export default function PricePredictForm({
         listings.
       </p>
       <hr className="border-gray-300 dark:border-gray-600" />
+
+      <div className="m-auto p-8 flex flex-col gap-2 items-center">
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <>
+            {error && (
+              <div className="w-full m-auto bg-rose-500/10 border-rose-500 border p-4 text-center rounded">
+                <span>❗️ Something went wrong unexpectedly.</span>
+              </div>
+            )}
+            <div className="p-4 border-b border-gray-300 text-4xl md:text-6xl font-medium">
+              $ {predictedPrice.toFixed(2)}
+            </div>
+            <span className="text-sm text-gray-400">
+              Predicted monthly rental rate
+            </span>
+          </>
+        )}
+      </div>
 
       <TextInput
         fieldName="bed"
