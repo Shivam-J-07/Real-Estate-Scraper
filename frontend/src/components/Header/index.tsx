@@ -13,7 +13,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full px-8 py-4 flex flex-row justify-between text-sm font-medium">
+    <header className="w-full px-8 py-4 flex flex-row justify-between text-sm font-medium sticky top-0 bg-slate-50/50 z-50 dark:bg-slate-700/30 backdrop-blur-md">
       <div className="flex flex-row items-center gap-2">
         <Logo className="w-5" />
         <span className="self-start hidden sm:block">RentRite</span>
