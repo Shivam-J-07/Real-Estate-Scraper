@@ -8,6 +8,8 @@ import Loading from "@/components/Icons/Loading";
 import { fetchLatandLon } from "@/utils";
 import defaultValues from "./defaultValues";
 import { useState } from "react";
+import Link from "next/link";
+import { AnimatedCounter } from "react-animated-counter";
 
 export default function PricePredictForm() {
   const {
@@ -82,34 +84,35 @@ export default function PricePredictForm() {
   };
 
   return (
-    <div className="max-w-2xl flex flex-col lg:p-16 lg:flex-row lg:max-w-full lg:gap-16 gap-4 p-8 text-sm">
+    <div className="max-w-2xl flex flex-col lg:px-16 lg:flex-row lg:max-w-full lg:gap-16 gap-4 p-8">
       <div className="lg:max-w-lg flex flex-col gap-4">
         <h1 className="text-3xl font-medium">Rental Pricing Estimate</h1>
         <p className="text-sm">
           Provide the details for your rental unit listing and we&apos;ll give a
           price prediction for a monthly rate based on this month&apos;s rental
-          listings.
+          listings in major Canadian cities.{" "}
+          <Link href="trends" className="hover:underline text-sky-500">
+            See all the data we collect from these major cities.
+          </Link>
         </p>
         <hr className="border-gray-300 dark:border-gray-600" />
 
         <div className="m-auto p-8 flex flex-col gap-2 items-center">
-          {isLoading ? (
-            <Loading />
-          ) : (
-            <>
-              {error && (
-                <div className="w-full m-auto bg-rose-500/10 border-rose-500 border p-4 text-center rounded">
-                  <span>❗️ Something went wrong unexpectedly.</span>
-                </div>
-              )}
-              <div className="p-4 border-b border-gray-300 text-4xl md:text-6xl font-medium">
-                $ {predictedPrice.toFixed(2)}
-              </div>
-              <span className="text-sm text-gray-400">
-                Predicted monthly rental rate
-              </span>
-            </>
+          {error && (
+            <div className="w-full m-auto bg-rose-500/10 border-rose-500 border p-4 text-center rounded">
+              <span>❗️ Something went wrong unexpectedly.</span>
+            </div>
           )}
+          <div className="p-4 border-b border-gray-300 text-4xl md:text-6xl font-medium flex gap-4">
+            <span>$ </span>
+            <span>
+              <AnimatedCounter
+                value={Number(predictedPrice.toFixed(2))}
+                fontSize="60px"
+              />
+            </span>
+          </div>
+          <span className=" text-gray-400">Predicted monthly rental rate</span>
         </div>
       </div>
 
@@ -181,7 +184,7 @@ export default function PricePredictForm() {
         />
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-900 dark:text-gray-300">
+          <label className=" font-medium text-gray-900 dark:text-gray-300">
             Building Amenities
           </label>
           <div className="flex flex-row gap-2 flex-wrap">
@@ -231,7 +234,7 @@ export default function PricePredictForm() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-900 dark:text-gray-300">
+          <label className=" font-medium text-gray-900 dark:text-gray-300">
             Unit Amenities
           </label>
           <div className="flex flex-row gap-2 flex-wrap">
@@ -285,7 +288,7 @@ export default function PricePredictForm() {
             onClick={handleSubmit(submitForm)}
             className="self-center font-medium transition-all hover:bg-slate-800 bg-slate-600 dark:bg-slate-500 dark:hover:bg-slate-400 w-fit px-8 py-2 text-white rounded-full"
           >
-            Submit
+            {isLoading ? <Loading className="w-6" /> : "Submit"}
           </button>
         </div>
       </div>
