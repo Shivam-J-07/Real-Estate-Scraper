@@ -21,7 +21,7 @@ export default function TextInput({
   return (
     <>
       <div className="flex items-center gap-4">
-        <label className="text-sm font-medium text-gray-900 dark:text-gray-300">
+        <label className="font-medium text-gray-900 dark:text-gray-300">
           {label}
         </label>
         <input

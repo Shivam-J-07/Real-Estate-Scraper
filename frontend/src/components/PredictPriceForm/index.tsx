@@ -82,7 +82,7 @@ export default function PricePredictForm() {
   };
 
   return (
-    <div className="max-w-2xl flex flex-col lg:p-16 lg:flex-row lg:max-w-full lg:gap-16 gap-4 p-8 text-sm">
+    <div className="max-w-2xl flex flex-col lg:p-16 lg:flex-row lg:max-w-full lg:gap-16 gap-4 p-8 ">
       <div className="lg:max-w-lg flex flex-col gap-4">
         <h1 className="text-3xl font-medium">Rental Pricing Estimate</h1>
         <p className="text-sm">
@@ -105,7 +105,7 @@ export default function PricePredictForm() {
               <div className="p-4 border-b border-gray-300 text-4xl md:text-6xl font-medium">
                 $ {predictedPrice.toFixed(2)}
               </div>
-              <span className="text-sm text-gray-400">
+              <span className=" text-gray-400">
                 Predicted monthly rental rate
               </span>
             </>
@@ -181,7 +181,7 @@ export default function PricePredictForm() {
         />
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-900 dark:text-gray-300">
+          <label className=" font-medium text-gray-900 dark:text-gray-300">
             Building Amenities
           </label>
           <div className="flex flex-row gap-2 flex-wrap">
@@ -231,7 +231,7 @@ export default function PricePredictForm() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-900 dark:text-gray-300">
+          <label className=" font-medium text-gray-900 dark:text-gray-300">
             Unit Amenities
           </label>
           <div className="flex flex-row gap-2 flex-wrap">
