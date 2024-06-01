@@ -17,9 +17,10 @@ export default function PriceTrends() {
           Data Visualization
         </h1>
         <p className="text-sm">
-          Here&apos;s an overview of the monthly rental unit trends we&apos;ve gathered
-          from five major Canadian cities: Toronto, Montreal, Vancouver, Ottawa,
-          and Winnipeg. We use this data for our price predictions.
+          Here&apos;s an overview of the monthly rental unit trends we&apos;ve
+          gathered from six major Canadian cities: Toronto, Montreal, Vancouver,
+          Ottawa, Edmonton, and Winnipeg. We use this data for our price
+          predictions.
         </p>
         <hr className="border-gray-300 dark:border-gray-600" />
       </div>
