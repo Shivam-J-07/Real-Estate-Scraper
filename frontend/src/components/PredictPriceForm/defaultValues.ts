@@ -1,7 +1,7 @@
 const defaultValues = {
   bed: 1,
   bath: 1,
-  sqft: 900.0,
+  sqft: 550.0,
   pets: false,
   address: "450 Front St W",
   postal_code: "M5V 0V7",

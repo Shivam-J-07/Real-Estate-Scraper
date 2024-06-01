@@ -29,7 +29,7 @@ export default function TextInput({
             required: requiredErrorMessage,
           })}
           placeholder={placeholder}
-          className="transition-all py-1 px-3 rounded-full border focus:border-slate-200 focus:bg-white dark:focus:border-slate-500 dark:focus:bg-slate-500 outline-none bg-slate-200 dark:border-slate-600 dark:bg-slate-600 text-gray-900 dark:text-gray-300"
+          className="transition-all py-1 px-3 rounded-full border hover:bg-slate-50 focus:bg-white focus dark:bg-slate-600 dark:hover:bg-slate-500 dark:focus:bg-slate-600 dark:border-slate-500"
           type={type}
         />
       </div>

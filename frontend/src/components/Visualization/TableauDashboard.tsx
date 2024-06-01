@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { TableauViz } from "@tableau/embedding-api"
+import { TableauViz } from "@tableau/embedding-api";
 
 interface TableauDashboardProps {
   url: string;
@@ -24,9 +24,7 @@ const TableauDashboard: React.FC<TableauDashboardProps> = ({ url }) => {
     }
   }, [url]);
 
-  return (
-    <div ref={tableauVizRef} style={{ width: "800px", height: "600px" }} />
-  );
+  return <div ref={tableauVizRef} />;
 };
 
 export default TableauDashboard;
