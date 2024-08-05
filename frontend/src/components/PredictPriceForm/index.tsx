@@ -84,7 +84,7 @@ export default function PricePredictForm() {
   };
 
   return (
-    <div className="max-w-2xl flex flex-col lg:px-16 lg:flex-row lg:max-w-full lg:gap-16 gap-4 p-8">
+    <div className="max-w-2xl flex flex-grow flex-col lg:px-16 lg:flex-row lg:max-w-full lg:gap-16 gap-4 p-8">
       <div className="lg:max-w-lg flex flex-col gap-4">
         <h1 className="text-3xl font-medium">Rental Pricing Estimate</h1>
         <p className="text-sm">
@@ -116,7 +116,7 @@ export default function PricePredictForm() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 justify-center">
         <TextInput
           fieldName="bed"
           label="Bedrooms"
