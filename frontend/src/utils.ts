@@ -1,21 +1,22 @@
 import axios from "axios";
 
 export const fetchLatandLon = async (address: string) => {
-  const api_key = process.env.NEXT_PUBLIC_MAPS_API_KEY;
+  const formattedAddress = encodeURIComponent(address).replace(/%20+/g, "+");
+  try {
+    const res = await axios.get(
+      `https://nominatim.openstreetmap.org/search?q=${formattedAddress}&format=geojson`
+    );
+    const result = res.data.features[0];
 
-  if (api_key) {
-    try {
-      const res = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${api_key}`
-      );
-      const result = res.data.results[0].geometry.location;
-
-      return { lat: result.lat, lon: result.lng };
-    } catch (error) {
-      console.error("An error occurred fetching lat and lon", error);
+    if (!result) {
+      console.warn("Could not find lat and lon for address", address);
       return { lat: null, lon: null };
     }
-  }
 
-  return { lat: null, lon: null };
+    const [lon, lat] = result.geometry.coordinates;
+    return { lat, lon };
+  } catch (error) {
+    console.error("An error occurred fetching lat and lon", error);
+    return { lat: null, lon: null };
+  }
 };

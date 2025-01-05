@@ -29,16 +29,10 @@ export default function PricePredictForm() {
     setIsLoading(true);
     setError(false);
 
-    if (!process.env.NEXT_PUBLIC_MAPS_API_KEY) {
-      console.error("Could not find Maps API key");
-      setError(true);
-      setIsLoading(false);
-      return;
-    }
-
     const { city, address, postal_code } = getValues();
     const { lat, lon } = await fetchLatandLon(
-      `${address}, ${postal_code}, ${city}`
+    //   `${address}, ${postal_code}, ${city}`
+      `${address}, ${city}, Canada`
     );
 
     if (!lat || !lon) {
