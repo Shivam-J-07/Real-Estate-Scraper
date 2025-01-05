@@ -27,6 +27,8 @@ export default function TextInput({
         <input
           {...register(fieldName, {
             required: requiredErrorMessage,
+			valueAsNumber: type === "number", // Ensures input is treated as a number
+			validate: type == "number" ? ((value) => value > 0 || "The number must be positive") : undefined,
           })}
           placeholder={placeholder}
           className="transition-all py-1 px-3 rounded-full border hover:bg-slate-50 focus:bg-white focus dark:bg-slate-600 dark:hover:bg-slate-500 dark:focus:bg-slate-600 dark:border-slate-500"
